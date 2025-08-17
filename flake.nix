@@ -15,15 +15,18 @@
     devShells.${system}.default = pkgs.mkShell {
       packages = with pkgs; [
         go
-        sqlite
         air
+        docker
+        docker-compose
+        postgresql
       ];
 
       shellHook = ''
         echo "----------------------------"
         echo "Development environment ready"
         echo "Go version: $(go version)"
-        echo "SQLite version: $(sqlite3 --version)"
+        echo "Docker version: $(docker --version)"
+        echo "Docker Compose version: $(docker-compose --version)"
         echo "Air version: $(air -v)"
         echo "----------------------------"
       '';
