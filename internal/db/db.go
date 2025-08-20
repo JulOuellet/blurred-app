@@ -15,7 +15,7 @@ type DB struct {
 	Conn *sql.DB
 }
 
-func New(dbURL, migrationsDir string) *DB {
+func New(dbURL, migrationsDir string) *sql.DB {
 	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -29,15 +29,7 @@ func New(dbURL, migrationsDir string) *DB {
 
 	applyMigrations(dbURL, migrationsDir)
 
-	return &DB{Conn: conn}
-}
-
-func (d *DB) Close() {
-	if err := d.Conn.Close(); err != nil {
-		log.Printf("Failed to close database: %v", err)
-	} else {
-		log.Println("Database connection closed")
-	}
+	return conn
 }
 
 func applyMigrations(dbURL, migrationsDir string) {
