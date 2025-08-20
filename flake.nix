@@ -19,6 +19,7 @@
         docker
         docker-compose
         postgresql
+        go-migrate
       ];
 
       shellHook = ''

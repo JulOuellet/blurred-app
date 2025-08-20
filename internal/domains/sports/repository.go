@@ -1,6 +1,9 @@
 package sports
 
-import "database/sql"
+import (
+	"database/sql"
+	"log"
+)
 
 type SportRepository interface {
 	GetAll() ([]SportModel, error)
@@ -15,7 +18,7 @@ func NewSportRepository(db *sql.DB) SportRepository {
 }
 
 func (r *sportRepository) GetAll() ([]SportModel, error) {
-	rows, err := r.db.Query("SELECT id, name FROM sports")
+	rows, err := r.db.Query("SELECT * FROM sports")
 	if err != nil {
 		return nil, err
 	}
@@ -24,9 +27,11 @@ func (r *sportRepository) GetAll() ([]SportModel, error) {
 	var sports []SportModel
 	for rows.Next() {
 		var sport SportModel
-		if err := rows.Scan(&sport.ID, &sport.Name); err != nil {
+		if err := rows.Scan(&sport.ID, &sport.Name, &sport.CreatedAt); err != nil {
+			log.Printf("Error scanning row: %v", err)
 			return nil, err
 		}
+
 		sports = append(sports, sport)
 	}
 
