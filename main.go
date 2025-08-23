@@ -10,7 +10,7 @@ import (
 func main() {
 	const DB_URL = "postgres://postgres:password@localhost:5432/sportlight?sslmode=disable"
 
-	database := db.New(DB_URL, "internal/db/migrations")
+	database := db.Init(DB_URL, "internal/db/migrations")
 	defer database.Close()
 
 	e := web.RegisterRoutes(database)

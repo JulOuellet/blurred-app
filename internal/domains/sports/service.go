@@ -1,7 +1,16 @@
 package sports
 
+import (
+	"fmt"
+	"strings"
+
+	"github.com/google/uuid"
+)
+
 type SportService interface {
 	GetAll() ([]SportModel, error)
+	GetById(id uuid.UUID) (*SportModel, error)
+	Create(req CreateSportRequest) (*SportModel, error)
 }
 
 type sportService struct {
@@ -13,9 +22,18 @@ func NewSportService(sportRepo SportRepository) SportService {
 }
 
 func (s *sportService) GetAll() ([]SportModel, error) {
-	sports, err := s.sportRepo.GetAll()
-	if err != nil {
-		return nil, err
+	return s.sportRepo.GetAll()
+}
+
+func (s *sportService) GetById(id uuid.UUID) (*SportModel, error) {
+	return s.sportRepo.GetById(id)
+}
+
+func (s *sportService) Create(req CreateSportRequest) (*SportModel, error) {
+	name := strings.TrimSpace(req.Name)
+	if name == "" {
+		return nil, fmt.Errorf("Sport name cannot be empty")
 	}
-	return sports, nil
+
+	return s.sportRepo.Create(name)
 }

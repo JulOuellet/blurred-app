@@ -1,43 +1,57 @@
 package sports
 
 import (
-	"database/sql"
-	"log"
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type SportRepository interface {
 	GetAll() ([]SportModel, error)
+	GetById(id uuid.UUID) (*SportModel, error)
+	Create(name string) (*SportModel, error)
 }
 
 type sportRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewSportRepository(db *sql.DB) SportRepository {
+func NewSportRepository(db *sqlx.DB) SportRepository {
 	return &sportRepository{db: db}
 }
 
 func (r *sportRepository) GetAll() ([]SportModel, error) {
-	rows, err := r.db.Query("SELECT * FROM sports")
+	query := `SELECT id, name, created_at, updated_at 
+		FROM sports 
+		ORDER BY created_at DESC`
+
+	var sports []SportModel
+	return sports, r.db.Select(&sports, query)
+}
+
+func (r *sportRepository) GetById(id uuid.UUID) (*SportModel, error) {
+	query := `SELECT id, name, created_at, updated_at 
+		FROM sports 
+		WHERE id = $1`
+
+	var sport SportModel
+	err := r.db.Get(&sport, query, id)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	var sports []SportModel
-	for rows.Next() {
-		var sport SportModel
-		if err := rows.Scan(&sport.ID, &sport.Name, &sport.CreatedAt); err != nil {
-			log.Printf("Error scanning row: %v", err)
-			return nil, err
-		}
+	return &sport, nil
+}
 
-		sports = append(sports, sport)
-	}
+func (r *sportRepository) Create(name string) (*SportModel, error) {
+	query := `INSERT INTO sports (name)
+			  VALUES ($1)
+	          RETURNING id, name, created_at, updated_at`
 
-	if err := rows.Err(); err != nil {
+	var sport SportModel
+	err := r.db.Get(&sport, query, name)
+	if err != nil {
 		return nil, err
 	}
 
-	return sports, nil
+	return &sport, nil
 }

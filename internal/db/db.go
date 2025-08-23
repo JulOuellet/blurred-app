@@ -1,22 +1,24 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 type DB struct {
-	Conn *sql.DB
+	Conn *sqlx.DB
 }
 
-func New(dbURL, migrationsDir string) *sql.DB {
-	conn, err := sql.Open("postgres", dbURL)
+func Init(dbURL, migrationsDir string) *sqlx.DB {
+	applyMigrations(dbURL, migrationsDir)
+
+	conn, err := sqlx.Connect("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
@@ -25,10 +27,7 @@ func New(dbURL, migrationsDir string) *sql.DB {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
-	log.Println("Database connection established")
-
-	applyMigrations(dbURL, migrationsDir)
-
+	log.Println("Dtabase connection established")
 	return conn
 }
 
