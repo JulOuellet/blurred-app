@@ -13,6 +13,6 @@ type SportModel struct {
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-type CreateSportRequest struct {
+type SportRequest struct {
 	Name string `json:"name"`
 }

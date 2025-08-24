@@ -27,6 +27,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	sports.GET("", sportHandler.GetAll)
 	sports.GET("/:id", sportHandler.GetById)
 	sports.POST("", sportHandler.Create)
+	sports.PATCH("/:id", sportHandler.Update)
 
 	// seasonsRepository := seasons.NewSeasonRepository(db)
 	// seasonsService := seasons.NewSeasonService(seasonsRepository)

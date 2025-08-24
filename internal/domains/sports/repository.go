@@ -9,6 +9,7 @@ type SportRepository interface {
 	GetAll() ([]SportModel, error)
 	GetById(id uuid.UUID) (*SportModel, error)
 	Create(name string) (*SportModel, error)
+	Update(id uuid.UUID, name string) (*SportModel, error)
 }
 
 type sportRepository struct {
@@ -21,8 +22,8 @@ func NewSportRepository(db *sqlx.DB) SportRepository {
 
 func (r *sportRepository) GetAll() ([]SportModel, error) {
 	query := `SELECT id, name, created_at, updated_at 
-		FROM sports 
-		ORDER BY created_at DESC`
+			  FROM sports 
+			  ORDER BY created_at DESC`
 
 	var sports []SportModel
 	return sports, r.db.Select(&sports, query)
@@ -30,8 +31,8 @@ func (r *sportRepository) GetAll() ([]SportModel, error) {
 
 func (r *sportRepository) GetById(id uuid.UUID) (*SportModel, error) {
 	query := `SELECT id, name, created_at, updated_at 
-		FROM sports 
-		WHERE id = $1`
+			  FROM sports 
+			  WHERE id = $1`
 
 	var sport SportModel
 	err := r.db.Get(&sport, query, id)
@@ -49,6 +50,21 @@ func (r *sportRepository) Create(name string) (*SportModel, error) {
 
 	var sport SportModel
 	err := r.db.Get(&sport, query, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sport, nil
+}
+
+func (r *sportRepository) Update(id uuid.UUID, name string) (*SportModel, error) {
+	query := `UPDATE sports
+			  SET name = $1
+			  WHERE id = $2
+			  RETURNING id, name, created_at, updated_at`
+
+	var sport SportModel
+	err := r.db.Get(&sport, query, name, id)
 	if err != nil {
 		return nil, err
 	}
