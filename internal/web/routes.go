@@ -1,10 +1,8 @@
 package web
 
 import (
-	"net/http"
-
 	"github.com/JulOuellet/sportlight/internal/domains/sports"
-	"github.com/JulOuellet/sportlight/internal/pages"
+	"github.com/JulOuellet/sportlight/internal/web/handlers"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -29,13 +27,6 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	sports.POST("", sportHandler.Create)
 	sports.PATCH("/:id", sportHandler.Update)
 
-	// seasonsRepository := seasons.NewSeasonRepository(db)
-	// seasonsService := seasons.NewSeasonService(seasonsRepository)
-	// seasonsHandler := seasons.NewSeasonHandler(seasonsService)
-
-	// e.GET("/seasons", seasonsHandler.GetAll)
-
-	e.GET("/", echo.WrapHandler(http.HandlerFunc(pages.IndexHandler)))
-
+	e.GET("/", handlers.HomePage)
 	return e
 }
