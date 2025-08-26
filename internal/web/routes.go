@@ -11,6 +11,8 @@ import (
 func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	e := echo.New()
 
+	e.Static("/assets", "assets")
+
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())

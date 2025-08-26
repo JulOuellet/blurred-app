@@ -22,6 +22,7 @@
         docker-compose
         postgresql
         templ.packages.${system}.templ
+        tailwindcss_4
       ];
 
       shellHook = ''
