@@ -3,7 +3,7 @@ module.exports = {
   content: [
     "./**/*.templ",
     "./**/*.go",
-    "./static/**/*.js",
+    "./assets/**/*.js",
   ],
   theme: {
     extend: {},
