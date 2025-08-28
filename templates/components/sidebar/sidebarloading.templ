@@ -1,0 +1,26 @@
+package sidebar
+
+templ SidebarLoading() {
+	<div class="flex h-screen flex-col justify-between border-e border-gray-100 bg-white">
+		<div class="px-4 py-6">
+			<span class="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
+				Logo
+			</span>
+			<ul class="mt-6 space-y-1">
+				<li>
+					<a
+						href="#"
+						class="block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700"
+					>
+						Sports
+					</a>
+				</li>
+				<li>
+					<div class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400">
+						Loading sports...
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+}

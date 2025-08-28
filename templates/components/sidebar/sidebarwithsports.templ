@@ -1,6 +1,8 @@
 package sidebar
 
-templ Sidebar() {
+import "github.com/JulOuellet/sportlight/internal/domains/sports"
+
+templ SidebarWithSports(sportsList []sports.SportModel) {
 	<div class="flex h-screen flex-col justify-between border-e border-gray-100 bg-white">
 		<div class="px-4 py-6">
 			<span class="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
@@ -15,9 +17,9 @@ templ Sidebar() {
 						Sports
 					</a>
 				</li>
-				<li>
-					@SportItem("Road Cycling")
-				</li>
+				<div id="sports-list">
+					@SportsList(sportsList)
+				</div>
 			</ul>
 		</div>
 	</div>

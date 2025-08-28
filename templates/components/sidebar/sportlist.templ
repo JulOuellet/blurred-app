@@ -1,0 +1,11 @@
+package sidebar
+
+import "github.com/JulOuellet/sportlight/internal/domains/sports"
+
+templ SportsList(sportsList []sports.SportModel) {
+	for _, sport := range sportsList {
+		<li>
+			@SportItem(sport.Name)
+		</li>
+	}
+}
