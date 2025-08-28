@@ -25,11 +25,11 @@ func NewSidebarHandler(sportService sports.SportService) SidebarHandler {
 func (h *sidebarHandler) GetSidebar(c echo.Context) error {
 	sportsList, err := h.sportService.GetAll()
 	if err != nil {
-		component := sidebar.SidebarWithSports([]sports.SportModel{})
+		component := sidebar.Sidebar([]sports.SportModel{})
 		return component.Render(c.Request().Context(), c.Response().Writer)
 	}
 
-	component := sidebar.SidebarWithSports(sportsList)
+	component := sidebar.Sidebar(sportsList)
 	return component.Render(c.Request().Context(), c.Response().Writer)
 }
 
