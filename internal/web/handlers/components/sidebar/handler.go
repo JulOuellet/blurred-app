@@ -22,11 +22,9 @@ func NewSidebarHandler(sportService sports.SportService) SidebarHandler {
 	return &sidebarHandler{sportService: sportService}
 }
 
-// Get the complete sidebar component (for initial load)
 func (h *sidebarHandler) GetSidebar(c echo.Context) error {
 	sportsList, err := h.sportService.GetAll()
 	if err != nil {
-		// Return sidebar with empty sports on error
 		component := sidebar.SidebarWithSports([]sports.SportModel{})
 		return component.Render(c.Request().Context(), c.Response().Writer)
 	}
@@ -35,7 +33,6 @@ func (h *sidebarHandler) GetSidebar(c echo.Context) error {
 	return component.Render(c.Request().Context(), c.Response().Writer)
 }
 
-// Refresh just the sports list portion (for updates)
 func (h *sidebarHandler) RefreshSports(c echo.Context) error {
 	sports, err := h.sportService.GetAll()
 	if err != nil {
