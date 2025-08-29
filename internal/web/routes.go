@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/JulOuellet/sportlight/internal/domains/seasons"
 	"github.com/JulOuellet/sportlight/internal/domains/sports"
 	"github.com/JulOuellet/sportlight/internal/web/handlers/components/sidebar"
 	"github.com/JulOuellet/sportlight/internal/web/handlers/pages"
@@ -19,15 +20,24 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	sportRepository := sports.NewSportRepository(db)
 	sportService := sports.NewSportService(sportRepository)
 
+	seasonRepository := seasons.NewSeasonRepository(db)
+	seasonService := seasons.NewSeasonService(seasonRepository)
+
 	api := e.Group("/api")
 	{
 		sportHandler := sports.NewSportHandler(sportService)
-
 		sportsApi := api.Group("/sports")
 		sportsApi.GET("", sportHandler.GetAll)
 		sportsApi.GET("/:id", sportHandler.GetById)
 		sportsApi.POST("", sportHandler.Create)
 		sportsApi.PATCH("/:id", sportHandler.Update)
+
+		seasonHandler := seasons.NewSeasonHandler(seasonService)
+		seasonsApi := api.Group("/seasons")
+		seasonsApi.GET("", seasonHandler.GetAll)
+		seasonsApi.GET("/:id", seasonHandler.GetById)
+		seasonsApi.POST("", seasonHandler.Create)
+
 	}
 
 	components := e.Group("/components")
@@ -35,8 +45,8 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		sidebarHandler := sidebar.NewSidebarHandler(sportService)
 
 		sidebarRoutes := components.Group("/sidebar")
-		sidebarRoutes.GET("", sidebarHandler.GetSidebar)           // Full sidebar
-		sidebarRoutes.GET("/sports", sidebarHandler.RefreshSports) // Just sports list
+		sidebarRoutes.GET("", sidebarHandler.GetSidebar)
+		sidebarRoutes.GET("/sports", sidebarHandler.RefreshSports)
 	}
 
 	e.GET("/", pages.HomePage)
