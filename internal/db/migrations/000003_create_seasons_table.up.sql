@@ -1,8 +1,8 @@
 CREATE TABLE seasons (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid (),
     name varchar(255) NOT NULL,
-    start_date timestamptz NOT NULL,
-    end_date timestamptz NOT NULL,
+    start_date timestamptz,
+    end_date timestamptz,
     sport_id uuid NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now(),

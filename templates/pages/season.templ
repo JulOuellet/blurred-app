@@ -1,0 +1,13 @@
+package pages
+
+import "github.com/JulOuellet/sportlight/internal/domains/seasons"
+import "github.com/JulOuellet/sportlight/templates/layouts"
+
+templ SeasonPage(season *seasons.SeasonModel) {
+	@layouts.Base("Season - " + season.Name) {
+		<div class="p-4 text-black">
+			<h1 class="text-3xl font-bold">{ season.Name }</h1>
+			<p class="mt-2 text-gray-600">Season details will go here.</p>
+		</div>
+	}
+}
