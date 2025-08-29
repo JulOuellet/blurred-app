@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/JulOuellet/sportlight/internal/domains/seasons"
 	"github.com/google/uuid"
 )
 
@@ -12,14 +13,19 @@ type SportService interface {
 	GetById(id uuid.UUID) (*SportModel, error)
 	Create(req SportRequest) (*SportModel, error)
 	Update(id uuid.UUID, req SportRequest) (*SportModel, error)
+	GetSportWithSeasons(id uuid.UUID) (*SportWithSeasons, error)
 }
 
 type sportService struct {
-	sportRepo SportRepository
+	sportRepo  SportRepository
+	seasonrepo seasons.SeasonRepository
 }
 
-func NewSportService(sportRepo SportRepository) SportService {
-	return &sportService{sportRepo: sportRepo}
+func NewSportService(sportRepo SportRepository, seasonRepo seasons.SeasonRepository) SportService {
+	return &sportService{
+		sportRepo:  sportRepo,
+		seasonrepo: seasonRepo,
+	}
 }
 
 func (s *sportService) GetAll() ([]SportModel, error) {
@@ -46,4 +52,21 @@ func (s *sportService) Update(id uuid.UUID, req SportRequest) (*SportModel, erro
 	}
 
 	return s.sportRepo.Update(id, name)
+}
+
+func (s *sportService) GetSportWithSeasons(id uuid.UUID) (*SportWithSeasons, error) {
+	sport, err := s.sportRepo.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	seasons, err := s.seasonrepo.GetAllBySportId(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SportWithSeasons{
+		SportModel: *sport,
+		Seasons:    seasons,
+	}, nil
 }

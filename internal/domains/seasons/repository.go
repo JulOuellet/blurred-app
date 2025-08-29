@@ -11,6 +11,7 @@ type SeasonRepository interface {
 	GetAll() ([]SeasonModel, error)
 	GetById(id uuid.UUID) (*SeasonModel, error)
 	Create(name string, startDate time.Time, endDate time.Time, sportId uuid.UUID) (*SeasonModel, error)
+	GetAllBySportId(sportId uuid.UUID) ([]SeasonModel, error)
 }
 
 type seasonRepository struct {
@@ -60,4 +61,15 @@ func (r *seasonRepository) Create(
 		return nil, err
 	}
 	return &season, nil
+}
+
+func (r *seasonRepository) GetAllBySportId(sportId uuid.UUID) ([]SeasonModel, error) {
+	query := `SELECT id, name, start_date, end_date, sport_id, created_at, updated_at
+			  FROM seasons
+			  WHERE sport_id = $1
+			  ORDER BY start_date DESC`
+
+	var seasons []SeasonModel
+	err := r.db.Select(seasons, query, sportId)
+	return seasons, err
 }
