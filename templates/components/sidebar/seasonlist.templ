@@ -1,0 +1,11 @@
+package sidebar
+
+import "github.com/JulOuellet/sportlight/internal/domains/seasons"
+
+templ SeasonsList(seasonList []seasons.SeasonModel) {
+	for _, season := range seasonList {
+		<li>
+			@SeasonItem(season)
+		</li>
+	}
+}

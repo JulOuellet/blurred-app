@@ -23,22 +23,22 @@ func NewSidebarHandler(sportService sports.SportService) SidebarHandler {
 }
 
 func (h *sidebarHandler) GetSidebar(c echo.Context) error {
-	sportsList, err := h.sportService.GetAll()
+	sportsWithSeasons, err := h.sportService.GetAllWithSeasons()
 	if err != nil {
-		component := sidebar.Sidebar([]sports.SportModel{})
+		component := sidebar.Sidebar([]sports.SportWithSeasons{})
 		return component.Render(c.Request().Context(), c.Response().Writer)
 	}
 
-	component := sidebar.Sidebar(sportsList)
+	component := sidebar.Sidebar(sportsWithSeasons)
 	return component.Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *sidebarHandler) RefreshSports(c echo.Context) error {
-	sports, err := h.sportService.GetAll()
+	sportsWithSeasons, err := h.sportService.GetAllWithSeasons()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get sports")
 	}
 
-	component := sidebar.SportsList(sports)
+	component := sidebar.SportsList(sportsWithSeasons)
 	return component.Render(c.Request().Context(), c.Response().Writer)
 }

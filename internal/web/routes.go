@@ -18,9 +18,9 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	e.Use(middleware.CORS())
 
 	sportRepository := sports.NewSportRepository(db)
-	sportService := sports.NewSportService(sportRepository)
-
 	seasonRepository := seasons.NewSeasonRepository(db)
+
+	sportService := sports.NewSportService(sportRepository, seasonRepository)
 	seasonService := seasons.NewSeasonService(seasonRepository)
 
 	api := e.Group("/api")

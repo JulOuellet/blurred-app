@@ -14,6 +14,7 @@ type SportService interface {
 	Create(req SportRequest) (*SportModel, error)
 	Update(id uuid.UUID, req SportRequest) (*SportModel, error)
 	GetSportWithSeasons(id uuid.UUID) (*SportWithSeasons, error)
+	GetAllWithSeasons() ([]SportWithSeasons, error)
 }
 
 type sportService struct {
@@ -69,4 +70,33 @@ func (s *sportService) GetSportWithSeasons(id uuid.UUID) (*SportWithSeasons, err
 		SportModel: *sport,
 		Seasons:    seasons,
 	}, nil
+}
+
+func (s *sportService) GetAllWithSeasons() ([]SportWithSeasons, error) {
+	sports, err := s.sportRepo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	allSeasons, err := s.seasonrepo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	// Group seasons by sport ID
+	seasonsMap := make(map[uuid.UUID][]seasons.SeasonModel)
+	for _, season := range allSeasons {
+		seasonsMap[season.SportID] = append(seasonsMap[season.SportID], season)
+	}
+
+	// Combine sports + seasons
+	result := make([]SportWithSeasons, 0, len(sports))
+	for _, sport := range sports {
+		result = append(result, SportWithSeasons{
+			SportModel: sport,
+			Seasons:    seasonsMap[sport.ID],
+		})
+	}
+
+	return result, nil
 }

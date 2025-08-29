@@ -2,10 +2,10 @@ package sidebar
 
 import "github.com/JulOuellet/sportlight/internal/domains/sports"
 
-templ SportsList(sportsList []sports.SportModel) {
+templ SportsList(sportsList []sports.SportWithSeasons) {
 	for _, sport := range sportsList {
 		<li>
-			@SportItem(sport.Name)
+			@SportItem(sport.Name, sport.Seasons)
 		</li>
 	}
 }

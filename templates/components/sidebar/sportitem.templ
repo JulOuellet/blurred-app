@@ -1,6 +1,8 @@
 package sidebar
 
-templ SportItem(name string) {
+import "github.com/JulOuellet/sportlight/internal/domains/seasons"
+
+templ SportItem(name string, seasons []seasons.SeasonModel) {
 	<details class="group [&_summary::-webkit-details-marker]:hidden">
 		<summary
 			class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
@@ -22,22 +24,7 @@ templ SportItem(name string) {
 			</span>
 		</summary>
 		<ul class="mt-2 space-y-1 px-4">
-			<li>
-				<a
-					href="#"
-					class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-				>
-					2025
-				</a>
-			</li>
-			<li>
-				<a
-					href="#"
-					class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-				>
-					2024
-				</a>
-			</li>
+			@SeasonsList(seasons)
 		</ul>
 	</details>
 }
