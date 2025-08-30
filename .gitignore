@@ -1,3 +1,4 @@
 .air.toml
 tmp/
 .direnv/
+templates/**/*_templ.go
