@@ -14,14 +14,10 @@ templ Base(title string) {
 		</head>
 		<body>
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-[240px_1fr] lg:gap-4">
-				<div class="h-32 rounded bg-gray-300">
-					<div hx-get="/components/sidebar" hx-trigger="load" hx-swap="outerHTML">
-						@sidebar.SidebarLoading()
-					</div>
+				<div hx-get="/components/sidebar" hx-trigger="load" hx-swap="outerHTML">
+					@sidebar.SidebarLoading()
 				</div>
-				<div class="h-32 rounded bg-gray-300">
-					{ children... }
-				</div>
+				{ children... }
 			</div>
 		</body>
 	</html>

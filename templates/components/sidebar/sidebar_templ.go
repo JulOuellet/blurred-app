@@ -31,7 +31,7 @@ func Sidebar(sportsList []sports.SportWithSeasons) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex h-screen flex-col justify-between border-e border-gray-100 bg-white\"><div class=\"px-4 py-6\"><span class=\"grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600\">Logo</span><ul class=\"mt-6 space-y-1\"><li><a href=\"#\" class=\"block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700\">Sports</a></li><div id=\"sports-list\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex h-screen flex-col justify-between border-e border-gray-100 bg-white\"><div class=\"px-4 py-6\"><a href=\"/\" class=\"grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 transition-colors cursor-pointer\">Logo</a><ul class=\"mt-6 space-y-1\"><div id=\"sports-list\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
