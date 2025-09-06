@@ -1,4 +1,3 @@
-// internal/web/handlers/sidebar/handler.go
 package sidebar
 
 import (

@@ -14,3 +14,5 @@ CREATE TRIGGER set_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column ();
 
+CREATE INDEX idx_seasons_sport_id ON seasons (sport_id);
+

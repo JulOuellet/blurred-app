@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/JulOuellet/sportlight/internal/domains/championships"
 	"github.com/JulOuellet/sportlight/internal/domains/seasons"
 	"github.com/JulOuellet/sportlight/internal/domains/sports"
 	"github.com/JulOuellet/sportlight/internal/web/handlers/components/sidebar"
@@ -19,9 +20,11 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 
 	sportRepository := sports.NewSportRepository(db)
 	seasonRepository := seasons.NewSeasonRepository(db)
+	championshipRepository := championships.NewChampionshipRepository(db)
 
 	sportService := sports.NewSportService(sportRepository, seasonRepository)
 	seasonService := seasons.NewSeasonService(seasonRepository)
+	championshipService := championships.NewChampionshipService(championshipRepository)
 
 	api := e.Group("/api")
 	{
@@ -38,6 +41,11 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		seasonsApi.GET("/:id", seasonHandler.GetById)
 		seasonsApi.POST("", seasonHandler.Create)
 
+		championshipHandler := championships.NewChampionshipHandler(championshipService)
+		championshipsApi := api.Group("/championships")
+		championshipsApi.GET("", championshipHandler.GetAll)
+		championshipsApi.GET("/:id", championshipHandler.GetById)
+		championshipsApi.POST("", championshipHandler.Create)
 	}
 
 	components := e.Group("/components")
