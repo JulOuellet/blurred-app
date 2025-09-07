@@ -1,6 +1,6 @@
 package layouts
 
-import "github.com/JulOuellet/sportlight/templates/components/sidebar"
+import "github.com/JulOuellet/sportlight/templates/components/sidebars"
 
 templ Base(title string) {
 	<!DOCTYPE html>
@@ -15,7 +15,7 @@ templ Base(title string) {
 		<body>
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-[240px_1fr] lg:gap-4">
 				<div hx-get="/components/sidebar" hx-trigger="load" hx-swap="outerHTML">
-					@sidebar.SidebarLoading()
+					@sidebars.SidebarLoading()
 				</div>
 				{ children... }
 			</div>

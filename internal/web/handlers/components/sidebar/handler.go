@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/JulOuellet/sportlight/internal/domains/sports"
-	"github.com/JulOuellet/sportlight/templates/components/sidebar"
+	"github.com/JulOuellet/sportlight/templates/components/sidebars"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,11 +24,11 @@ func NewSidebarHandler(sportService sports.SportService) SidebarHandler {
 func (h *sidebarHandler) GetSidebar(c echo.Context) error {
 	sportsWithSeasons, err := h.sportService.GetAllWithSeasons()
 	if err != nil {
-		component := sidebar.Sidebar([]sports.SportWithSeasons{})
+		component := sidebars.Sidebar([]sports.SportWithSeasons{})
 		return component.Render(c.Request().Context(), c.Response().Writer)
 	}
 
-	component := sidebar.Sidebar(sportsWithSeasons)
+	component := sidebars.Sidebar(sportsWithSeasons)
 	return component.Render(c.Request().Context(), c.Response().Writer)
 }
 
@@ -38,6 +38,6 @@ func (h *sidebarHandler) RefreshSports(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get sports")
 	}
 
-	component := sidebar.SportsList(sportsWithSeasons)
+	component := sidebars.SportsList(sportsWithSeasons)
 	return component.Render(c.Request().Context(), c.Response().Writer)
 }

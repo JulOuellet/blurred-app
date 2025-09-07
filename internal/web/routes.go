@@ -57,7 +57,11 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		sidebarRoutes.GET("/sports", sidebarHandler.RefreshSports)
 	}
 
-	seasonPageHandler := pages.NewSeasonPageHandler(seasonService, championshipService)
+	seasonPageHandler := pages.NewSeasonPageHandler(
+		seasonService,
+		championshipService,
+		sportService,
+	)
 	e.GET("/", pages.HomePage)
 	e.GET("/seasons/:id", seasonPageHandler.GetSeason)
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/JulOuellet/sportlight/internal/domains/championships"
 	"github.com/JulOuellet/sportlight/internal/domains/seasons"
+	"github.com/JulOuellet/sportlight/internal/domains/sports"
 	"github.com/JulOuellet/sportlight/templates/pages"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -13,15 +14,18 @@ import (
 type SeasonPageHandler struct {
 	seasonService   seasons.SeasonService
 	championService championships.ChampionshipService
+	sportService    sports.SportService
 }
 
 func NewSeasonPageHandler(
 	seasonService seasons.SeasonService,
 	championService championships.ChampionshipService,
+	sportService sports.SportService,
 ) *SeasonPageHandler {
 	return &SeasonPageHandler{
 		seasonService:   seasonService,
 		championService: championService,
+		sportService:    sportService,
 	}
 }
 
@@ -43,5 +47,10 @@ func (h *SeasonPageHandler) GetSeason(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Failed to retrieve championships")
 	}
 
-	return pages.SeasonPage(season, championships).Render(c.Request().Context(), c.Response().Writer)
+	sport, err := h.sportService.GetById(season.SportID)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to retrieve sport")
+	}
+
+	return pages.SeasonPage(season, championships, *sport).Render(c.Request().Context(), c.Response().Writer)
 }
