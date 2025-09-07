@@ -21,18 +21,34 @@ func NewSportRepository(db *sqlx.DB) SportRepository {
 }
 
 func (r *sportRepository) GetAll() ([]SportModel, error) {
-	query := `SELECT id, name, created_at, updated_at 
-			  FROM sports 
-			  ORDER BY created_at DESC`
+	query := `
+		SELECT 
+		  id, 
+		  name, 
+		  created_at, 
+		  updated_at 	  
+		FROM 
+		  sports 
+		ORDER BY 
+		  created_at DESC
+	`
 
 	var sports []SportModel
 	return sports, r.db.Select(&sports, query)
 }
 
 func (r *sportRepository) GetById(id uuid.UUID) (*SportModel, error) {
-	query := `SELECT id, name, created_at, updated_at 
-			  FROM sports 
-			  WHERE id = $1`
+	query := `
+		SELECT 
+		  id, 
+		  name, 
+		  created_at, 
+		  updated_at 		  
+		FROM 
+		  sports 	  
+		WHERE 
+		  id = $1
+	`
 
 	var sport SportModel
 	err := r.db.Get(&sport, query, id)
@@ -44,9 +60,17 @@ func (r *sportRepository) GetById(id uuid.UUID) (*SportModel, error) {
 }
 
 func (r *sportRepository) Create(name string) (*SportModel, error) {
-	query := `INSERT INTO sports (name)
-			  VALUES ($1)
-	          RETURNING id, name, created_at, updated_at`
+	query := `
+		INSERT INTO 
+		  sports (name)
+		VALUES 
+		  ($1)
+	    RETURNING 
+		  id,
+		  name,
+		  created_at,
+		  updated_at
+	`
 
 	var sport SportModel
 	err := r.db.Get(&sport, query, name)
@@ -58,10 +82,18 @@ func (r *sportRepository) Create(name string) (*SportModel, error) {
 }
 
 func (r *sportRepository) Update(id uuid.UUID, name string) (*SportModel, error) {
-	query := `UPDATE sports
-			  SET name = $1
-			  WHERE id = $2
-			  RETURNING id, name, created_at, updated_at`
+	query := `
+		UPDATE sports
+		SET 
+		  name = $1
+	  	WHERE 
+		  id = $2
+		RETURNING 
+		  id, 
+		  name, 
+		  created_at, 
+		  updated_at
+	`
 
 	var sport SportModel
 	err := r.db.Get(&sport, query, name, id)
