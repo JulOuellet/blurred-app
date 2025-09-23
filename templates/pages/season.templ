@@ -14,7 +14,7 @@ templ SeasonPage(
 ) {
 	@layouts.Base("Season - " + season.Name) {
 		<div class="p-5 md:p-10">
-			@breadcrumbs.SeaspmBreadcrumb(season.Name, sport.Name)
+			@breadcrumbs.SeasonBreadcrumb(season.Name, sport.Name)
 			<div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
 				for _, championship := range championships {
 					<div class="break-inside-avoid mb-6">
