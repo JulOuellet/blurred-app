@@ -3,7 +3,10 @@ package cards
 import "github.com/JulOuellet/sportlight/internal/domains/championships"
 
 templ ChampionshipCard(championship championships.ChampionshipModel) {
-	<a href="#" class="group relative block rounded-xl shadow-lg overflow-hidden bg-black">
+	<a
+		href={ templ.SafeURL("/championships/" + championship.ID.String()) }
+		class="group relative block rounded-xl shadow-lg overflow-hidden bg-black"
+	>
 		<img alt="" src={ championship.ReferenceImgURL } class="w-full h-auto object-cover opacity-75 transition-opacity group-hover:opacity-50"/>
 		<div class="absolute inset-0 p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
 			<div>

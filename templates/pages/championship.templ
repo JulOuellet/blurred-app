@@ -1,0 +1,10 @@
+package pages
+
+import "github.com/JulOuellet/sportlight/templates/layouts"
+import "github.com/JulOuellet/sportlight/internal/domains/championships"
+
+templ ChampionshipPage(championship *championships.ChampionshipModel) {
+	@layouts.Base("test") {
+		<h1>{ championship.Name } </h1>
+	}
+}
