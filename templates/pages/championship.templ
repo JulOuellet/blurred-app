@@ -2,9 +2,22 @@ package pages
 
 import "github.com/JulOuellet/sportlight/templates/layouts"
 import "github.com/JulOuellet/sportlight/internal/domains/championships"
+import "github.com/JulOuellet/sportlight/templates/components/breadcrumbs"
+import "github.com/JulOuellet/sportlight/internal/domains/sports"
+import "github.com/JulOuellet/sportlight/internal/domains/seasons"
 
-templ ChampionshipPage(championship *championships.ChampionshipModel) {
+templ ChampionshipPage(
+	championship *championships.ChampionshipModel,
+	sport *sports.SportModel,
+	season *seasons.SeasonModel,
+) {
 	@layouts.Base(championship.Name) {
-		<h1>{ championship.Name } </h1>
+		<div class="p-5 md:p-10">
+			@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
+				{Label: sport.Name, URL: "", IsActive: false},
+				{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},
+				{Label: championship.Name, URL: "", IsActive: true},
+			})
+		</div>
 	}
 }
