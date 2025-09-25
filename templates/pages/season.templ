@@ -5,7 +5,7 @@ import "github.com/JulOuellet/sportlight/templates/layouts"
 import "github.com/JulOuellet/sportlight/internal/domains/championships"
 import "github.com/JulOuellet/sportlight/internal/domains/sports"
 import "github.com/JulOuellet/sportlight/templates/components/cards/championships"
-import "github.com/JulOuellet/sportlight/templates/components/breadcrumbs/seasons"
+import "github.com/JulOuellet/sportlight/templates/components/breadcrumbs"
 
 templ SeasonPage(
 	season *seasons.SeasonModel,
@@ -14,7 +14,10 @@ templ SeasonPage(
 ) {
 	@layouts.Base("Season - " + season.Name) {
 		<div class="p-5 md:p-10">
-			@breadcrumbs.SeasonBreadcrumb(season.Name, sport.Name)
+			@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
+				{Label: sport.Name, URL: "", IsActive: false},
+				{Label: season.Name, URL: "", IsActive: true},
+			})
 			<div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
 				for _, championship := range championships {
 					<div class="break-inside-avoid mb-6">
