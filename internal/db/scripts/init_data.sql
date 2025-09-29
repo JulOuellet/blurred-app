@@ -8,3 +8,26 @@ INSERT INTO championships (id, name, organization, start_date, end_date, season_
     VALUES ('4f37ff2c-d000-4486-88c6-3a059d4c96e9', 'Grand Prix cycliste de Québec', 'UCI', '2025-09-12T00:00:00Z', '2025-09-12T23:59:59Z', 'fb566050-e7ed-464c-9a19-b984b5dcdd34', 'Watch highlights of the Grand Prix cycliste de Québec taking place on September 12 in the roads of Quebec City.', 'https://images.unsplash.com/photo-1613061323515-60cf45de72d7', '2025-09-06T22:31:24.760113Z', '2025-09-06T22:31:24.760113Z'),
     ('4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', 'Tour de France', 'UCI', '2025-07-05T00:00:00Z', '2025-07-27T23:59:59Z', 'fb566050-e7ed-464c-9a19-b984b5dcdd34', 'Watch highlights of all 21 stages of the 2025 Tour de France, running from July 5 to July 27.', 'https://images.unsplash.com/photo-1640890810035-aea65fdb1291', '2025-09-06T21:42:10.475667Z', '2025-09-06T21:42:10.475667Z');
 
+INSERT INTO events (id, name, date, championship_id, created_at, updated_at)
+    VALUES ('50b1a2e3-c4d5-4b67-89e0-1f2e3a4b5c6d', 'Stage 1 - Lille to Lille', '2025-07-05T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('71e2b3f4-d5c6-5a78-90f1-2d3c4b5a6f7e', 'Stage 2 - Lauwin-Planque to Boulogne-sur-Mer', '2025-07-06T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('62d3c4a5-e6b7-4c89-01a2-3f4e5d6c7b8a', 'Stage 3 - Valenciennes to Dunkerque', '2025-07-07T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('53c4d5b6-f7a8-4d90-12b3-4e5d6c7b8a9f', 'Stage 4 - Amiens to Rouen', '2025-07-08T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('44b5e6c7-a8a9-4e01-23c4-5d6c7b8a9f0e', 'Stage 5 - Caen to Caen (Time Trial)', '2025-07-09T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('35a6f7d8-b9b0-4f12-34d5-6c7b8a9f0e1d', 'Stage 6 - Bayeux to Vire Normandy', '2025-07-10T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('2697a8e9-c0c1-4a23-45e6-7b8a9f0e1d2c', 'Stage 7 - Saint-Malo to Mûr-de-Bretagne Guerlédan', '2025-07-11T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('1788b9f0-d1d2-4b34-56f7-8a9f0e1d2c3b', 'Stage 8 - Saint-Méen-le-Grand to Laval', '2025-07-12T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('0879c0a1-e2e3-4c45-67a8-9f0e1d2c3b4a', 'Stage 9 - Chinon to Châteauroux', '2025-07-13T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('a960d1b2-f3f4-4d56-78b9-0e1d2c3b4a5f', 'Stage 10 - Ennezat to Le Mont-Dore Puy de Sancy', '2025-07-14T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('c142f3d4-b5b6-4f78-90d1-2c3b4a5f6e7d', 'Stage 11 - Toulouse to Toulouse', '2025-07-16T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('d233a4e5-c6c7-5a89-01e2-3b4a5f6e7d8c', 'Stage 12 - Auch to Hautacam', '2025-07-17T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('e324b5f6-d7d8-5b90-12f3-4a5f6e7d8c9b', 'Stage 13 - Loudenvielle to Peyragudes (Time Trial)', '2025-07-18T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('f415c6a7-e8e9-5c01-23a4-5f6e7d8c9b0a', 'Stage 14 - Pau to Luchon Superbagnères', '2025-07-19T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('a506d7b8-f9f0-5d12-34b5-6e7d8c9b0a1f', 'Stage 15 - Muret to Carcassonne', '2025-07-20T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('c788f9d0-b1b2-5f34-56d7-8c9b0a1f2e3d', 'Stage 16 - Montpellier to Mont Ventoux', '2025-07-22T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('d879a0e1-c2c3-6a45-67e8-9b0a1f2e3d4c', 'Stage 17 - Bollène to Valence', '2025-07-23T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('e960b1f2-d3d4-6b56-78f9-0a1f2e3d4c5b', 'Stage 18 - Vif to Courchevel Col de la Loze', '2025-07-24T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('f051c2a3-e4e5-6c67-89a0-1f2e3d4c5b6a', 'Stage 19 - Albertville to La Plagne', '2025-07-25T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('a142d3b4-f5f6-6d78-90b1-2e3d4c5b6a7f', 'Stage 20 - Nantua to Pontarlier', '2025-07-26T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now()),
+    ('b233e4c5-a6a7-6e89-01c2-3d4c5b6a7f8e', 'Stage 21 - Mantes to Paris (Champs-Élysées)', '2025-07-27T00:00:00Z', '4a965e4a-037d-4cb1-9ac1-499a8b5a93bc', now(), now());
+
