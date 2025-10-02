@@ -18,6 +18,7 @@ templ ChampionshipPage(
 				{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},
 				{Label: championship.Name, URL: "", IsActive: true},
 			})
+			<p class="text-2xl font-bold mb-4">{ championship.Name }</p>
 		</div>
 	}
 }
