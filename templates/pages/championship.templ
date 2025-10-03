@@ -5,11 +5,14 @@ import "github.com/JulOuellet/sportlight/internal/domains/championships"
 import "github.com/JulOuellet/sportlight/templates/components/breadcrumbs"
 import "github.com/JulOuellet/sportlight/internal/domains/sports"
 import "github.com/JulOuellet/sportlight/internal/domains/seasons"
+import "github.com/JulOuellet/sportlight/templates/components/cards"
+import "github.com/JulOuellet/sportlight/internal/domains/events"
 
 templ ChampionshipPage(
 	championship *championships.ChampionshipModel,
 	sport *sports.SportModel,
 	season *seasons.SeasonModel,
+	events []events.EventModel,
 ) {
 	@layouts.Base(championship.Name) {
 		<div class="p-5 md:p-10">
@@ -18,7 +21,9 @@ templ ChampionshipPage(
 				{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},
 				{Label: championship.Name, URL: "", IsActive: true},
 			})
-			<p class="text-2xl font-bold mb-4">{ championship.Name }</p>
+			for _, event := range events {
+				@cards.EventCard(event)
+			}
 		</div>
 	}
 }

@@ -79,6 +79,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		championshipService,
 		seasonService,
 		sportService,
+		eventService,
 	)
 	e.GET("/championships/:id", championshipPageHandler.GetChampionship)
 

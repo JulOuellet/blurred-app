@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/JulOuellet/sportlight/internal/domains/championships"
+	"github.com/JulOuellet/sportlight/internal/domains/events"
 	"github.com/JulOuellet/sportlight/internal/domains/seasons"
 	"github.com/JulOuellet/sportlight/internal/domains/sports"
 	"github.com/JulOuellet/sportlight/templates/pages"
@@ -15,17 +16,20 @@ type ChampionshipPageHandler struct {
 	championService championships.ChampionshipService
 	seasonService   seasons.SeasonService
 	sportService    sports.SportService
+	evetService     events.EventService
 }
 
 func NewChampionshipPageHandler(
 	championService championships.ChampionshipService,
 	seasonService seasons.SeasonService,
 	sportService sports.SportService,
+	evetService events.EventService,
 ) *ChampionshipPageHandler {
 	return &ChampionshipPageHandler{
 		championService: championService,
 		seasonService:   seasonService,
 		sportService:    sportService,
+		evetService:     evetService,
 	}
 }
 
@@ -52,5 +56,10 @@ func (h *ChampionshipPageHandler) GetChampionship(c echo.Context) error {
 		return c.String(http.StatusNotFound, "Sport not found")
 	}
 
-	return pages.ChampionshipPage(championship, sport, season).Render(c.Request().Context(), c.Response().Writer)
+	events, err := h.evetService.GetAllByChampionshipId(id)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to retrieve events")
+	}
+
+	return pages.ChampionshipPage(championship, sport, season, events).Render(c.Request().Context(), c.Response().Writer)
 }
