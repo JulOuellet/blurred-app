@@ -1,0 +1,17 @@
+package cards
+
+import "github.com/JulOuellet/sportlight/internal/domains/events"
+
+templ EventCard(event events.EventModel) {
+	<div class="max-w-4xl mx-auto p-6">
+		<a href={ templ.SafeURL("/events/" + event.ID.String()) } class="flex items-center gap-4 p-4 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors mb-4">
+			<div class="flex-1 h-24 flex flex-col justify-center">
+				<h3 class="text-lg font-semibold">{ event.Name }</h3>
+				<p class="text-gray-600 text-sm">{ event.Date.Format("January 2, 2006") }</p>
+			</div>
+			<svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+			</svg>
+		</a>
+	</div>
+}
