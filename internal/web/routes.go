@@ -1,12 +1,12 @@
 package web
 
 import (
-	"github.com/JulOuellet/sportlight/internal/domains/championships"
-	"github.com/JulOuellet/sportlight/internal/domains/events"
-	"github.com/JulOuellet/sportlight/internal/domains/seasons"
-	"github.com/JulOuellet/sportlight/internal/domains/sports"
-	"github.com/JulOuellet/sportlight/internal/web/handlers/components/sidebar"
-	"github.com/JulOuellet/sportlight/internal/web/handlers/pages"
+	"github.com/JulOuellet/blurred-app/internal/domains/championships"
+	"github.com/JulOuellet/blurred-app/internal/domains/events"
+	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
+	"github.com/JulOuellet/blurred-app/internal/domains/sports"
+	"github.com/JulOuellet/blurred-app/internal/web/handlers/components/sidebar"
+	"github.com/JulOuellet/blurred-app/internal/web/handlers/pages"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

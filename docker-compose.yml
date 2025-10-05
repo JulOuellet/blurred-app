@@ -1,11 +1,11 @@
 services:
   db:
     image: postgres:16
-    container_name: sportlight_db
+    container_name: blurred_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: sportlight
+      POSTGRES_DB: blurred
     ports:
       - "5432:5432"
     volumes:

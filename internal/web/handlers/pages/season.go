@@ -3,10 +3,10 @@ package pages
 import (
 	"net/http"
 
-	"github.com/JulOuellet/sportlight/internal/domains/championships"
-	"github.com/JulOuellet/sportlight/internal/domains/seasons"
-	"github.com/JulOuellet/sportlight/internal/domains/sports"
-	"github.com/JulOuellet/sportlight/templates/pages"
+	"github.com/JulOuellet/blurred-app/internal/domains/championships"
+	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
+	"github.com/JulOuellet/blurred-app/internal/domains/sports"
+	"github.com/JulOuellet/blurred-app/templates/pages"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )

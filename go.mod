@@ -1,4 +1,4 @@
-module github.com/JulOuellet/sportlight
+module github.com/JulOuellet/blurred-app
 
 go 1.24.5
 

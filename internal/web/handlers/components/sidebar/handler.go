@@ -3,8 +3,8 @@ package sidebar
 import (
 	"net/http"
 
-	"github.com/JulOuellet/sportlight/internal/domains/sports"
-	"github.com/JulOuellet/sportlight/templates/components/sidebars"
+	"github.com/JulOuellet/blurred-app/internal/domains/sports"
+	"github.com/JulOuellet/blurred-app/templates/components/sidebars"
 	"github.com/labstack/echo/v4"
 )
 

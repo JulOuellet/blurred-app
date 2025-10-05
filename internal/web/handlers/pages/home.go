@@ -1,7 +1,7 @@
 package pages
 
 import (
-	"github.com/JulOuellet/sportlight/templates/pages"
+	"github.com/JulOuellet/blurred-app/templates/pages"
 	"github.com/labstack/echo/v4"
 )
 

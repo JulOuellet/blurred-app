@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/JulOuellet/sportlight/internal/domains/seasons"
+	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/google/uuid"
 )
 
