@@ -1,0 +1,27 @@
+package pages
+
+import "github.com/JulOuellet/blurred-app/templates/components/breadcrumbs"
+import "github.com/JulOuellet/blurred-app/internal/domains/championships"
+import "github.com/JulOuellet/blurred-app/internal/domains/sports"
+import "github.com/JulOuellet/blurred-app/internal/domains/seasons"
+import "github.com/JulOuellet/blurred-app/internal/domains/events"
+import "github.com/JulOuellet/blurred-app/templates/layouts"
+
+templ EventPage(
+	championship *championships.ChampionshipModel,
+	sport *sports.SportModel,
+	season *seasons.SeasonModel,
+	event *events.EventModel,
+) {
+	@layouts.Base(championship.Name) {
+		<div class="p-5 md:p-10">
+			@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
+				{Label: sport.Name, URL: "", IsActive: false},
+				{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},
+				{Label: championship.Name, URL: "/championships/" + championship.ID.String(), IsActive: false},
+				{Label: event.Name, URL: "", IsActive: true},
+			})
+			<p class="text-gray-600 mb-4">TEST</p>
+		</div>
+	}
+}

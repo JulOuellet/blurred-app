@@ -12,36 +12,41 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ChampionshipPageHandler struct {
+type EventPageHandler struct {
 	championService championships.ChampionshipService
 	seasonService   seasons.SeasonService
 	sportService    sports.SportService
-	eventService    events.EventService
+	evetService     events.EventService
 }
 
-func NewChampionshipPageHandler(
+func NewEventPageHandler(
 	championService championships.ChampionshipService,
 	seasonService seasons.SeasonService,
 	sportService sports.SportService,
-	eventService events.EventService,
+	evetService events.EventService,
 ) *ChampionshipPageHandler {
 	return &ChampionshipPageHandler{
 		championService: championService,
 		seasonService:   seasonService,
 		sportService:    sportService,
-		eventService:    eventService,
+		eventService:    evetService,
 	}
 }
 
-func (h *ChampionshipPageHandler) GetChampionship(c echo.Context) error {
+func (h *ChampionshipPageHandler) GetEvent(c echo.Context) error {
 	idStr := c.Param("id")
 
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		return c.String(http.StatusBadRequest, "Invalid championship ID")
+		return c.String(http.StatusBadRequest, "Invalid event ID")
 	}
 
-	championship, err := h.championService.GetById(id)
+	event, err := h.eventService.GetById(id)
+	if err != nil {
+		return c.String(http.StatusNotFound, "Event not found")
+	}
+
+	championship, err := h.championService.GetById(event.ChampionshipID)
 	if err != nil {
 		return c.String(http.StatusNotFound, "Championship not found")
 	}
@@ -56,10 +61,5 @@ func (h *ChampionshipPageHandler) GetChampionship(c echo.Context) error {
 		return c.String(http.StatusNotFound, "Sport not found")
 	}
 
-	events, err := h.eventService.GetAllByChampionshipId(id)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "Failed to retrieve events")
-	}
-
-	return pages.ChampionshipPage(championship, sport, season, events).Render(c.Request().Context(), c.Response().Writer)
+	return pages.EventPage(championship, sport, season, event).Render(c.Request().Context(), c.Response().Writer)
 }

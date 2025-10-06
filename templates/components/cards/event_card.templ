@@ -3,7 +3,7 @@ package cards
 import "github.com/JulOuellet/blurred-app/internal/domains/events"
 
 templ EventCard(event events.EventModel) {
-	<div class="max-w-4xl mx-auto p-6">
+	<div class="max-w-4xl mx-auto">
 		<a href={ templ.SafeURL("/events/" + event.ID.String()) } class="flex items-center gap-4 p-4 bg-white rounded-lg shadow hover:bg-gray-50 transition-colors mb-4">
 			<div class="flex-1 h-24 flex flex-col justify-center">
 				<h3 class="text-lg font-semibold">{ event.Name }</h3>
