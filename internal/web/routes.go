@@ -3,6 +3,7 @@ package web
 import (
 	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
+	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/internal/web/handlers/components/sidebar"
@@ -23,11 +24,13 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	seasonRepository := seasons.NewSeasonRepository(db)
 	championshipRepository := championships.NewChampionshipRepository(db)
 	eventRepository := events.NewEventRepository(db)
+	highlightRepository := highlights.NewHighlightRepository(db)
 
 	sportService := sports.NewSportService(sportRepository, seasonRepository)
 	seasonService := seasons.NewSeasonService(seasonRepository)
 	championshipService := championships.NewChampionshipService(championshipRepository)
 	eventService := events.NewEventService(eventRepository)
+	highlightService := highlights.NewHighlightService(highlightRepository)
 
 	api := e.Group("/api")
 	{
@@ -56,6 +59,13 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		eventsApi.GET("/:id", eventHandler.GetById)
 		eventsApi.POST("", eventHandler.Create)
 		eventsApi.GET("/championship/:id", eventHandler.GetAllByChampionshipId)
+
+		highlightHandler := highlights.NewHighlightHandler(highlightService)
+		highlightsApi := api.Group("/highlights")
+		highlightsApi.GET("", highlightHandler.GetAll)
+		highlightsApi.GET("/:id", highlightHandler.GetById)
+		highlightsApi.POST("", highlightHandler.Create)
+		highlightsApi.GET("/event/:id", highlightHandler.GetAllByEventId)
 	}
 
 	components := e.Group("/components")
