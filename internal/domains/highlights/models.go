@@ -7,12 +7,12 @@ import (
 )
 
 type HighlightModel struct {
-	ID        string    `json:"id" db:"id"`
+	ID        uuid.UUID `json:"id" db:"id"`
 	Name      string    `json:"name" db:"name"`
 	URL       string    `json:"url" db:"url"`
 	Language  string    `json:"language" db:"language"`
 	MediaType string    `json:"mediaType" db:"media_type"`
-	Source    string    `json:"source" db:"source"`
+	Source    *string   `json:"source" db:"source"`
 	EventID   uuid.UUID `json:"eventId" db:"event_id"`
 	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt" db:"updated_at"`
