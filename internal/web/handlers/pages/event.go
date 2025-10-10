@@ -5,6 +5,7 @@ import (
 
 	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
+	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/templates/pages"
@@ -13,27 +14,30 @@ import (
 )
 
 type EventPageHandler struct {
-	championService championships.ChampionshipService
-	seasonService   seasons.SeasonService
-	sportService    sports.SportService
-	evetService     events.EventService
+	championService  championships.ChampionshipService
+	seasonService    seasons.SeasonService
+	sportService     sports.SportService
+	eventService     events.EventService
+	highlightService highlights.HighlightService
 }
 
 func NewEventPageHandler(
 	championService championships.ChampionshipService,
 	seasonService seasons.SeasonService,
 	sportService sports.SportService,
-	evetService events.EventService,
-) *ChampionshipPageHandler {
-	return &ChampionshipPageHandler{
-		championService: championService,
-		seasonService:   seasonService,
-		sportService:    sportService,
-		eventService:    evetService,
+	eventService events.EventService,
+	highlightService highlights.HighlightService,
+) *EventPageHandler {
+	return &EventPageHandler{
+		championService:  championService,
+		seasonService:    seasonService,
+		sportService:     sportService,
+		eventService:     eventService,
+		highlightService: highlightService,
 	}
 }
 
-func (h *ChampionshipPageHandler) GetEvent(c echo.Context) error {
+func (h *EventPageHandler) GetEvent(c echo.Context) error {
 	idStr := c.Param("id")
 
 	id, err := uuid.Parse(idStr)
@@ -61,5 +65,16 @@ func (h *ChampionshipPageHandler) GetEvent(c echo.Context) error {
 		return c.String(http.StatusNotFound, "Sport not found")
 	}
 
-	return pages.EventPage(championship, sport, season, event).Render(c.Request().Context(), c.Response().Writer)
+	highlights, err := h.highlightService.GetAllByEventId(event.ID)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to fetch highlights")
+	}
+
+	return pages.EventPage(
+		championship,
+		sport,
+		season,
+		event,
+		highlights,
+	).Render(c.Request().Context(), c.Response().Writer)
 }

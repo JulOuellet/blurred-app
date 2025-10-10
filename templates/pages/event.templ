@@ -6,12 +6,14 @@ import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 import "github.com/JulOuellet/blurred-app/internal/domains/seasons"
 import "github.com/JulOuellet/blurred-app/internal/domains/events"
 import "github.com/JulOuellet/blurred-app/templates/layouts"
+import "github.com/JulOuellet/blurred-app/internal/domains/highlights"
 
 templ EventPage(
 	championship *championships.ChampionshipModel,
 	sport *sports.SportModel,
 	season *seasons.SeasonModel,
 	event *events.EventModel,
+	highlights []highlights.HighlightModel,
 ) {
 	@layouts.Base(championship.Name) {
 		<div class="p-5 md:p-10">
@@ -21,7 +23,7 @@ templ EventPage(
 				{Label: championship.Name, URL: "/championships/" + championship.ID.String(), IsActive: false},
 				{Label: event.Name, URL: "", IsActive: true},
 			})
-			<p class="text-gray-600 mb-4">TEST</p>
+			<p class="text-gray-600 mb-4">{ highlights[0].Name }</p>
 		</div>
 	}
 }
