@@ -2,8 +2,7 @@ CREATE TABLE highlights (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid (),
     name varchar(255) NOT NULL,
     url text NOT NULL,
-    language varchar
-(10) NOT NULL,
+    lang varchar(10) NOT NULL,
     media_type varchar(50) NOT NULL,
     source varchar(255),
     event_id uuid NOT NULL,
