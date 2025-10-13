@@ -10,7 +10,7 @@ type HighlightModel struct {
 	ID        uuid.UUID `json:"id" db:"id"`
 	Name      string    `json:"name" db:"name"`
 	URL       string    `json:"url" db:"url"`
-	Language  string    `json:"language" db:"language"`
+	Lang      string    `json:"lang" db:"lang"`
 	MediaType string    `json:"mediaType" db:"media_type"`
 	Source    *string   `json:"source" db:"source"`
 	EventID   uuid.UUID `json:"eventId" db:"event_id"`
