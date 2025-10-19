@@ -45,6 +45,8 @@ func (s *highlightService) Create(req HighlightRequest) (*HighlightModel, error)
 		return nil, fmt.Errorf("highlight url cannot be empty")
 	}
 
+	youtubeID := strings.TrimSpace(req.YoutubeID)
+
 	language := strings.TrimSpace(req.Language)
 	if language == "" {
 		return nil, fmt.Errorf("highlight language cannot be empty")
@@ -60,6 +62,7 @@ func (s *highlightService) Create(req HighlightRequest) (*HighlightModel, error)
 	return s.highlightRepo.Create(
 		name,
 		url,
+		youtubeID,
 		language,
 		mediaType,
 		source,

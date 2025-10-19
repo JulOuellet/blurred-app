@@ -10,6 +10,7 @@ type HighlightModel struct {
 	ID        uuid.UUID `json:"id" db:"id"`
 	Name      string    `json:"name" db:"name"`
 	URL       string    `json:"url" db:"url"`
+	YoutubeID *string   `json:"youtubeId" db:"youtube_id"`
 	Lang      string    `json:"lang" db:"lang"`
 	MediaType string    `json:"mediaType" db:"media_type"`
 	Source    *string   `json:"source" db:"source"`
@@ -21,6 +22,7 @@ type HighlightModel struct {
 type HighlightRequest struct {
 	Name      string    `json:"name"`
 	URL       string    `json:"url"`
+	YoutubeID string    `json:"youtubeId"`
 	Language  string    `json:"language"`
 	MediaType string    `json:"mediaType"`
 	Source    string    `json:"source"`

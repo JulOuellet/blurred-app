@@ -11,10 +11,11 @@ type HighlightRepository interface {
 	Create(
 		name string,
 		url string,
+		youtubeID string,
 		language string,
 		mediaType string,
 		source string,
-		eventId uuid.UUID,
+		eventID uuid.UUID,
 	) (*HighlightModel, error)
 	GetAllByEventId(eventId uuid.UUID) ([]HighlightModel, error)
 }
@@ -33,6 +34,7 @@ func (r *highlightRepository) GetAll() ([]HighlightModel, error) {
 		  id, 
 		  name, 
 		  url, 
+		  youtube_id,
 		  lang, 
 		  media_type, 
 		  source, 
@@ -53,7 +55,8 @@ func (r *highlightRepository) GetById(id uuid.UUID) (*HighlightModel, error) {
 		SELECT 
 		  id, 
 		  name, 
-		  url, 
+		  url,
+		  youtube_id,
 		  lang, 
 		  media_type, 
 		  source, 
@@ -76,27 +79,30 @@ func (r *highlightRepository) GetById(id uuid.UUID) (*HighlightModel, error) {
 func (r *highlightRepository) Create(
 	name string,
 	url string,
+	youtubeID string,
 	language string,
 	mediaType string,
 	source string,
-	eventId uuid.UUID,
+	eventID uuid.UUID,
 ) (*HighlightModel, error) {
 	query := `
 		INSERT INTO
 		  highlights (
 			name,
 			url,
-			language,
+		    youtube_id,
+			lang,
 			media_type,
 			source,
 			event_id
 		  )
 		VALUES
-		  ($1, $2, $3, $4, $5, $6)
+		  ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING
 		  id,
 		  name,
 		  url,
+		  youtube_id,
 		  lang,
 		  media_type,
 		  source,
@@ -110,10 +116,11 @@ func (r *highlightRepository) Create(
 		query,
 		name,
 		url,
+		youtubeID,
 		language,
 		mediaType,
 		source,
-		eventId,
+		eventID,
 	)
 	if err != nil {
 		return nil, err
@@ -127,6 +134,7 @@ func (r *highlightRepository) GetAllByEventId(eventId uuid.UUID) ([]HighlightMod
 		  id,
 		  name,
 		  url,
+		  youtube_id,
 		  lang,
 		  media_type,
 		  source,
