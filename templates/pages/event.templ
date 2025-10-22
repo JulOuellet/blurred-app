@@ -7,6 +7,7 @@ import "github.com/JulOuellet/blurred-app/internal/domains/seasons"
 import "github.com/JulOuellet/blurred-app/internal/domains/events"
 import "github.com/JulOuellet/blurred-app/templates/layouts"
 import "github.com/JulOuellet/blurred-app/internal/domains/highlights"
+import "github.com/JulOuellet/blurred-app/templates/components/medias"
 
 templ EventPage(
 	championship *championships.ChampionshipModel,
@@ -34,15 +35,7 @@ templ EventPage(
 						></iframe>
 					</div>
         -->
-					<div class="relative w-full" style="padding-bottom: 56.25%;">
-						<iframe
-							class="absolute top-0 left-0 w-full h-full rounded-lg"
-							src={ "https://www.youtube.com/embed/" + *highlight.YoutubeID + "?rel=0" }
-							title="YouTube video player"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowfullscreen
-						></iframe>
-					</div>
+					@medias.YoutubePlayer(highlight)
 				}
 			}
 		</div>
