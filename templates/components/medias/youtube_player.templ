@@ -15,7 +15,9 @@ templ YoutubePlayer(highlight highlights.HighlightModel, event events.EventModel
 		<div
 			id={ "thumbnail-" + *highlight.YoutubeID }
 			class="absolute top-0 left-0 w-full h-full rounded-lg flex items-center justify-center cursor-pointer z-10 group overflow-hidden"
-			style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);"
+			style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); background-size: 200% 200%; transition: background-position 0.6s ease;"
+			onmouseover="this.style.backgroundPosition = '100% 100%'"
+			onmouseout="this.style.backgroundPosition = '0% 0%'"
 			onclick={ revealVideo("thumbnail-"+*highlight.YoutubeID, "iframe-"+*highlight.YoutubeID) }
 		>
 			<!-- Pattern overlay -->
