@@ -1,12 +1,48 @@
 package medias
 
 import "github.com/JulOuellet/blurred-app/internal/domains/highlights"
+import "github.com/JulOuellet/blurred-app/internal/domains/events"
 
-templ YoutubePlayer(highlight highlights.HighlightModel) {
+script revealVideo(thumbnailID, iframeID string) {
+    document.getElementById(thumbnailID).style.display = 'none';
+    const iframe = document.getElementById(iframeID);
+    iframe.src = iframe.dataset.src;
+}
+
+templ YoutubePlayer(highlight highlights.HighlightModel, event events.EventModel) {
 	<div class="relative w-full" style="padding-bottom: 56.25%;">
+		<!-- Thumbnail Overlay -->
+		<div
+			id={ "thumbnail-" + *highlight.YoutubeID }
+			class="absolute top-0 left-0 w-full h-full rounded-lg flex items-center justify-center cursor-pointer z-10 group overflow-hidden"
+			style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);"
+			onclick={ revealVideo("thumbnail-"+*highlight.YoutubeID, "iframe-"+*highlight.YoutubeID) }
+		>
+			<!-- Pattern overlay -->
+			<div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0); background-size: 32px 32px;"></div>
+			<div class="relative text-center px-6">
+				<!-- Content wrapper with play button -->
+				<div class="flex items-start justify-center" style="gap: 0.75rem;">
+					<svg class="w-10 h-10" style="color: white; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); flex-shrink: 0; margin-top: 0.125rem;" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M8 5v14l11-7z"></path>
+					</svg>
+					<div class="text-left">
+						<h3 class="text-2xl font-bold mb-3" style="color: white;">
+							{ event.Name + " • " + *highlight.Source + " • " + highlight.Lang }
+						</h3>
+						<p class="text-sm" style="color: #9ca3af;">
+							Click to watch
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- YouTube video player -->
 		<iframe
+			id={ "iframe-" + *highlight.YoutubeID }
 			class="absolute top-0 left-0 w-full h-full rounded-lg"
-			src={ "https://www.youtube.com/embed/" + *highlight.YoutubeID + "?rel=0" }
+			data-src={ "https://www.youtube.com/embed/" + *highlight.YoutubeID + "?rel=0&autoplay=1" }
+			src=""
 			title="YouTube video player"
 			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 			allowfullscreen
