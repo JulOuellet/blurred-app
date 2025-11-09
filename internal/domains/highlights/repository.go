@@ -10,8 +10,10 @@ type HighlightRepository interface {
 	GetById(id uuid.UUID) (*HighlightModel, error)
 	Create(
 		name string,
+		genericName string,
 		url string,
 		youtubeID string,
+		durationSeconds int,
 		language string,
 		mediaType string,
 		source string,
@@ -33,8 +35,10 @@ func (r *highlightRepository) GetAll() ([]HighlightModel, error) {
 		SELECT 
 		  id, 
 		  name, 
+		  generic_name,
 		  url, 
 		  youtube_id,
+		  duration_seconds,
 		  lang, 
 		  media_type, 
 		  source, 
@@ -55,8 +59,10 @@ func (r *highlightRepository) GetById(id uuid.UUID) (*HighlightModel, error) {
 		SELECT 
 		  id, 
 		  name, 
+	      generic_name,
 		  url,
 		  youtube_id,
+		  duration_seconds,
 		  lang, 
 		  media_type, 
 		  source, 
@@ -78,8 +84,10 @@ func (r *highlightRepository) GetById(id uuid.UUID) (*HighlightModel, error) {
 
 func (r *highlightRepository) Create(
 	name string,
+	genericName string,
 	url string,
 	youtubeID string,
+	durationSeconds int,
 	language string,
 	mediaType string,
 	source string,
@@ -89,20 +97,24 @@ func (r *highlightRepository) Create(
 		INSERT INTO
 		  highlights (
 			name,
+			generic_name,
 			url,
 		    youtube_id,
+			duration_seconds,
 			lang,
 			media_type,
 			source,
 			event_id
 		  )
 		VALUES
-		  ($1, $2, $3, $4, $5, $6, $7)
+		  ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING
 		  id,
 		  name,
+		  generic_name,
 		  url,
 		  youtube_id,
+		  duration_seconds,
 		  lang,
 		  media_type,
 		  source,
@@ -115,8 +127,10 @@ func (r *highlightRepository) Create(
 		&highlight,
 		query,
 		name,
+		genericName,
 		url,
 		youtubeID,
+		durationSeconds,
 		language,
 		mediaType,
 		source,
@@ -133,8 +147,10 @@ func (r *highlightRepository) GetAllByEventId(eventId uuid.UUID) ([]HighlightMod
 	    SELECT
 		  id,
 		  name,
+		  generic_name,
 		  url,
 		  youtube_id,
+		  duration_seconds,
 		  lang,
 		  media_type,
 		  source,

@@ -1,8 +1,10 @@
 CREATE TABLE highlights (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid (),
     name varchar(255) NOT NULL,
+    generic_name varchar(255),
     url text NOT NULL,
     youtube_id varchar(50),
+    duration_seconds integer,
     lang varchar(10) NOT NULL,
     media_type varchar(50) NOT NULL,
     source varchar(255),

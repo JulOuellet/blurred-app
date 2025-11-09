@@ -27,7 +27,7 @@ templ EventPage(
 			<div class="max-w-4xl mx-auto">
 				for _, highlight := range highlights {
 					if highlight.MediaType == "VIDEO" && highlight.YoutubeID != nil {
-						@medias.YoutubePlayer(highlight, *event)
+						@medias.YoutubePlayer(highlight)
 					}
 				}
 			</div>

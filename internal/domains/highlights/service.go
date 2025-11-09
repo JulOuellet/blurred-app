@@ -40,6 +40,11 @@ func (s *highlightService) Create(req HighlightRequest) (*HighlightModel, error)
 		return nil, fmt.Errorf("highlight name cannot be empty")
 	}
 
+	genericName := strings.TrimSpace(req.GenericName)
+	if genericName == "" {
+		return nil, fmt.Errorf("highlight generic name cannot be empty")
+	}
+
 	url := strings.TrimSpace(req.URL)
 	if url == "" {
 		return nil, fmt.Errorf("highlight url cannot be empty")
@@ -61,8 +66,10 @@ func (s *highlightService) Create(req HighlightRequest) (*HighlightModel, error)
 
 	return s.highlightRepo.Create(
 		name,
+		genericName,
 		url,
 		youtubeID,
+		req.DurationSeconds,
 		language,
 		mediaType,
 		source,

@@ -1,7 +1,6 @@
 package medias
 
 import "github.com/JulOuellet/blurred-app/internal/domains/highlights"
-import "github.com/JulOuellet/blurred-app/internal/domains/events"
 
 script revealVideo(thumbnailID, iframeID string) {
     document.getElementById(thumbnailID).style.display = 'none';
@@ -9,7 +8,7 @@ script revealVideo(thumbnailID, iframeID string) {
     iframe.src = iframe.dataset.src;
 }
 
-templ YoutubePlayer(highlight highlights.HighlightModel, event events.EventModel) {
+templ YoutubePlayer(highlight highlights.HighlightModel) {
 	<div class="relative w-full" style="padding-bottom: 56.25%;">
 		<!-- Thumbnail Overlay -->
 		<div
@@ -30,10 +29,10 @@ templ YoutubePlayer(highlight highlights.HighlightModel, event events.EventModel
 					</svg>
 					<div class="text-left">
 						<h3 class="text-2xl font-bold mb-3" style="color: white;">
-							{ event.Name + " • " + *highlight.Source + " • " + highlight.Lang.DisplayName() }
+							{ *highlight.GenericName + " • " + *highlight.Source + " • " + highlight.Lang.DisplayName() }
 						</h3>
 						<p class="text-sm" style="color: #9ca3af;">
-							Click to watch
+							{ highlight.FormatDuration() + " • Click to watch" }
 						</p>
 					</div>
 				</div>
