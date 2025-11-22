@@ -15,7 +15,7 @@ templ generate --watch
 tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch
 ```
 
-#### Running migrations using golang-mgrate:
+#### Running migrations using golang-migrate:
 ```
 migrate -path ./internal/db/migrations -database $DATABASE_URL up
 ```
