@@ -3,7 +3,7 @@
 # --------------------------------------------------------
 FROM golang:1.24-alpine AS builder
 
-RUN apk add --no-cache curl git
+RUN apk add --no-cache curl git libc6-compat
 
 WORKDIR /app
 
