@@ -1,0 +1,9 @@
+.git
+.github
+.envrc
+flake.nix
+flake.lock
+tmp
+internal/db/scripts
+README.md
+docker-compose.yml
