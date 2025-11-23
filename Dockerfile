@@ -1,9 +1,9 @@
 # --------------------------------------------------------
 # STAGE 1: Build (Compiles CSS, Templ, and Go Binary)
 # --------------------------------------------------------
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24 AS builder
 
-RUN apk add --no-cache curl git libc6-compat
+RUN apt-get update && apt-get install -y curl git
 
 WORKDIR /app
 
@@ -41,13 +41,9 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-# Copy the binary from the builder stage
+# Copy artifacts from the builder
 COPY --from=builder /app/main .
-
-# Copy the migrations folder so the Go app can find them
 COPY --from=builder /app/internal/db/migrations ./internal/db/migrations
-
-# Copy static assets (CSS, images, JS)
 COPY --from=builder /app/assets ./assets/
 
 # Expose the port (for documentation, Railway overrides this)
