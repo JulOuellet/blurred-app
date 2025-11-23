@@ -2,19 +2,29 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/JulOuellet/blurred-app/internal/db"
 	"github.com/JulOuellet/blurred-app/internal/web"
 )
 
 func main() {
-	const DB_URL = "postgres://postgres:password@localhost:5432/blurred?sslmode=disable"
+	dbUrl := os.Getenv("DATABASE_URL")
+	if dbUrl == "" {
+		log.Fatal("DATABASE_URL environment variable is not set")
+	}
 
-	database := db.Init(DB_URL, "internal/db/migrations")
+	migrationPath := "internal/db/migrations"
+
+	database := db.Init(dbUrl, migrationPath)
 	defer database.Close()
 
 	e := web.RegisterRoutes(database)
 
-	log.Println("Server running on localhost:8080")
-	log.Fatal(e.Start(":8080"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT environment variable is not set")
+	}
+
+	log.Fatal(e.Start(":" + port))
 }

@@ -27,7 +27,7 @@ func Init(dbURL, migrationsDir string) *sqlx.DB {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
-	log.Println("Dtabase connection established")
+	log.Println("Database connection established")
 	return conn
 }
 
