@@ -52,5 +52,10 @@ func (h *SeasonPageHandler) GetSeason(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Failed to retrieve sport")
 	}
 
-	return pages.SeasonPage(season, championships, *sport).Render(c.Request().Context(), c.Response().Writer)
+	sportsList, err := h.sportService.GetAllWithSeasons()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to retrieve sports list")
+	}
+
+	return pages.SeasonPage(season, championships, *sport, sportsList).Render(c.Request().Context(), c.Response().Writer)
 }

@@ -70,11 +70,17 @@ func (h *EventPageHandler) GetEvent(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Failed to fetch highlights")
 	}
 
+	sportsList, err := h.sportService.GetAllWithSeasons()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to retrieve sports list")
+	}
+
 	return pages.EventPage(
 		championship,
 		sport,
 		season,
 		event,
 		highlights,
+		sportsList,
 	).Render(c.Request().Context(), c.Response().Writer)
 }

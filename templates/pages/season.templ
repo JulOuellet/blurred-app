@@ -11,8 +11,9 @@ templ SeasonPage(
 	season *seasons.SeasonModel,
 	championships []championships.ChampionshipModel,
 	sport sports.SportModel,
+	sportsList []sports.SportWithSeasons,
 ) {
-	@layouts.Base("Season - " + season.Name) {
+	@layouts.Base("Season - "+season.Name, sportsList) {
 		<div class="p-5 md:p-10">
 			@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
 				{Label: sport.Name, URL: "", IsActive: false},

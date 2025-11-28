@@ -6,7 +6,6 @@ import (
 	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
-	"github.com/JulOuellet/blurred-app/internal/web/handlers/components/sidebar"
 	"github.com/JulOuellet/blurred-app/internal/web/handlers/pages"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -68,21 +67,13 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		highlightsApi.GET("/event/:id", highlightHandler.GetAllByEventId)
 	}
 
-	components := e.Group("/components")
-	{
-		sidebarHandler := sidebar.NewSidebarHandler(sportService)
-
-		sidebarRoutes := components.Group("/sidebar")
-		sidebarRoutes.GET("", sidebarHandler.GetSidebar)
-		sidebarRoutes.GET("/sports", sidebarHandler.RefreshSports)
-	}
-
 	seasonPageHandler := pages.NewSeasonPageHandler(
 		seasonService,
 		championshipService,
 		sportService,
 	)
-	e.GET("/", pages.HomePage)
+	homePageHandler := pages.NewHomePageHandler(sportService)
+	e.GET("/", homePageHandler.GetHome)
 	e.GET("/seasons/:id", seasonPageHandler.GetSeason)
 
 	championshipPageHandler := pages.NewChampionshipPageHandler(

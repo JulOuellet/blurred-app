@@ -1,9 +1,10 @@
 package pages
 
 import "github.com/JulOuellet/blurred-app/templates/layouts"
+import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 
-templ Home() {
-	@layouts.Base("Blurred") {
+templ Home(sportsList []sports.SportWithSeasons) {
+	@layouts.Base("Blurred", sportsList) {
 		<div class="relative overflow-hidden bg-[url(https://images.unsplash.com/photo-1525284837422-f027637f3ac3)] bg-cover bg-top bg-no-repeat h-screen">
 			<div class="absolute top-1/2 left-0 right-0 w-full h-56 -translate-y-1/2 bg-white/30 backdrop-blur-sm flex flex-col justify-center items-end text-right px-12">
 				<div class="text-5xl font-bold text-white">Blurred</div>
