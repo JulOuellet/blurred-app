@@ -14,18 +14,26 @@ templ SeasonPage(
 	sportsList []sports.SportWithSeasons,
 ) {
 	@layouts.Base("Season - "+season.Name, sportsList) {
-		<div class="p-5 md:p-10">
-			@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
-				{Label: sport.Name, URL: "", IsActive: false},
-				{Label: season.Name, URL: "", IsActive: true},
-			})
-			<div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
-				for _, championship := range championships {
-					<div class="break-inside-avoid mb-6">
-						@cards.ChampionshipCard(championship)
-					</div>
-				}
-			</div>
-		</div>
+		@SeasonContent(season, championships, sport)
 	}
+}
+
+templ SeasonContent(
+	season *seasons.SeasonModel,
+	championships []championships.ChampionshipModel,
+	sport sports.SportModel,
+) {
+	<div class="p-5 md:p-10">
+		@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
+			{Label: sport.Name, URL: "", IsActive: false},
+			{Label: season.Name, URL: "", IsActive: true},
+		})
+		<div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+			for _, championship := range championships {
+				<div class="break-inside-avoid mb-6">
+					@cards.ChampionshipCard(championship)
+				</div>
+			}
+		</div>
+	</div>
 }

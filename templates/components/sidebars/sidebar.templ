@@ -5,7 +5,14 @@ import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 templ Sidebar(sportsList []sports.SportWithSeasons) {
 	<div class="flex h-screen flex-col justify-between bg-white">
 		<div class="px-4 py-6">
-			<a href="/" class="place-content-center text-5xl font-bold text-gray-900 cursor-pointer">
+			<a
+				href="/"
+				hx-get="/"
+				hx-target="#main-content"
+				hx-swap="innerHTML"
+				hx-push-url="true"
+				class="place-content-center text-5xl font-bold text-gray-900 cursor-pointer"
+			>
 				Blurred
 			</a>
 			<ul class="mt-6 space-y-1">
