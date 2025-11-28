@@ -17,10 +17,13 @@ func NewHomePageHandler(sportService sports.SportService) HomePageHandler {
 }
 
 func (h *HomePageHandler) GetHome(c echo.Context) error {
-	sports, err := h.sportService.GetAllWithSeasons()
+	sportsList, err := h.sportService.GetAllWithSeasons()
 	if err != nil {
 		// TODO: Better error handling
 		return err
 	}
-	return pages.Home(sports).Render(c.Request().Context(), c.Response().Writer)
+	if c.Request().Header.Get("HX-Request") == "true" {
+		return pages.HomeContent().Render(c.Request().Context(), c.Response().Writer)
+	}
+	return pages.HomePage(sportsList).Render(c.Request().Context(), c.Response().Writer)
 }

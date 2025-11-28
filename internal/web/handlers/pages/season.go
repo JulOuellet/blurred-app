@@ -57,5 +57,9 @@ func (h *SeasonPageHandler) GetSeason(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Failed to retrieve sports list")
 	}
 
+	if c.Request().Header.Get("HX-Request") == "true" {
+		return pages.SeasonContent(season, championships, *sport).Render(c.Request().Context(), c.Response().Writer)
+	}
+
 	return pages.SeasonPage(season, championships, *sport, sportsList).Render(c.Request().Context(), c.Response().Writer)
 }

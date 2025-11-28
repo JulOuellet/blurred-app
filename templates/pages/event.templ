@@ -18,20 +18,30 @@ templ EventPage(
 	sportsList []sports.SportWithSeasons,
 ) {
 	@layouts.Base(championship.Name, sportsList) {
-		<div class="p-5 md:p-10">
-			@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
-				{Label: sport.Name, URL: "", IsActive: false},
-				{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},
-				{Label: championship.Name, URL: "/championships/" + championship.ID.String(), IsActive: false},
-				{Label: event.Name, URL: "", IsActive: true},
-			})
-			<div class="max-w-4xl mx-auto">
-				for _, highlight := range highlights {
-					if highlight.MediaType == "VIDEO" && highlight.YoutubeID != nil {
-						@medias.YoutubePlayer(highlight)
-					}
-				}
-			</div>
-		</div>
+		@EventContent(championship, sport, season, event, highlights)
 	}
+}
+
+templ EventContent(
+	championship *championships.ChampionshipModel,
+	sport *sports.SportModel,
+	season *seasons.SeasonModel,
+	event *events.EventModel,
+	highlights []highlights.HighlightModel,
+) {
+	<div class="p-5 md:p-10">
+		@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
+			{Label: sport.Name, URL: "", IsActive: false},
+			{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},
+			{Label: championship.Name, URL: "/championships/" + championship.ID.String(), IsActive: false},
+			{Label: event.Name, URL: "", IsActive: true},
+		})
+		<div class="max-w-4xl mx-auto">
+			for _, highlight := range highlights {
+				if highlight.MediaType == "VIDEO" && highlight.YoutubeID != nil {
+					@medias.YoutubePlayer(highlight)
+				}
+			}
+		</div>
+	</div>
 }

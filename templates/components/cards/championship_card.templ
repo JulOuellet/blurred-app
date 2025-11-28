@@ -5,6 +5,10 @@ import "github.com/JulOuellet/blurred-app/internal/domains/championships"
 templ ChampionshipCard(championship championships.ChampionshipModel) {
 	<a
 		href={ templ.SafeURL("/championships/" + championship.ID.String()) }
+		hx-get={ templ.SafeURL("/championships/" + championship.ID.String()) }
+		hx-target="#main-content"
+		hx-swap="innerHTML"
+		hx-push-url="true"
 		class="group relative block rounded-xl shadow-lg overflow-hidden bg-black"
 	>
 		<img alt="" src={ championship.ReferenceImgURL } class="w-full h-auto object-cover opacity-75 transition-opacity group-hover:opacity-50"/>

@@ -75,6 +75,10 @@ func (h *EventPageHandler) GetEvent(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "Failed to retrieve sports list")
 	}
 
+	if c.Request().Header.Get("HX-Request") == "true" {
+		return pages.EventContent(championship, sport, season, event, highlights).Render(c.Request().Context(), c.Response().Writer)
+	}
+
 	return pages.EventPage(
 		championship,
 		sport,
