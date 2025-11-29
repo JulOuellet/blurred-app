@@ -3,4 +3,3 @@ tmp/
 .direnv/
 templates/**/*_templ.go
 templates/*_templ.go
-assets/css/output.css
