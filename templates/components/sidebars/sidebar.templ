@@ -3,23 +3,25 @@ package sidebars
 import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 
 templ Sidebar(sportsList []sports.SportWithSeasons) {
-	<div class="flex h-screen flex-col justify-between bg-white">
-		<div class="px-4 py-6">
+	<aside class="w-64 flex flex-col shrink-0 bg-neutral-100">
+		<div class="px-6 py-4 flex items-center h-16">
 			<a
 				href="/"
 				hx-get="/"
 				hx-target="#main-content"
 				hx-swap="innerHTML"
 				hx-push-url="true"
-				class="place-content-center text-5xl font-bold text-gray-900 cursor-pointer"
+				class="text-5xl font-bold text-neutral-800 tracking-tight cursor-pointer"
 			>
-				Blurred
+				B
 			</a>
-			<ul class="mt-6 space-y-1">
-				<div id="sports-list">
-					@SportsList(sportsList)
-				</div>
-			</ul>
 		</div>
-	</div>
+		<div class="flex-1 overflow-y-auto px-4 py-4">
+			<div id="sports-list" class="text-neutral-600">
+				<ul class="list-none">
+					@SportsList(sportsList)
+				</ul>
+			</div>
+		</div>
+	</aside>
 }

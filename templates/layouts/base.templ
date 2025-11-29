@@ -1,23 +1,32 @@
 package layouts
 
-import "github.com/JulOuellet/blurred-app/internal/domains/sports"
-import "github.com/JulOuellet/blurred-app/templates/components/sidebars"
+import (
+	"github.com/JulOuellet/blurred-app/internal/domains/sports"
+	"github.com/JulOuellet/blurred-app/templates/components/sidebars"
+	"github.com/JulOuellet/blurred-app/templates/components/topbars"
+)
 
 templ Base(title string, sportsList []sports.SportWithSeasons) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" class="h-full bg-neutral-100">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title }</title>
 			<link href="/assets/css/output.css" rel="stylesheet"/>
-			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js" integrity="sha384-Akqfrbj/HpNVo8k11SXBb6TlBWmXXlYQrCSqEWmyKJe+hDm3Z/B2WVG4smwBkRVm" crossorigin="anonymous"></script>
+			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
 		</head>
-		<body>
-			<div class="grid grid-cols-1 gap-4 lg:grid-cols-[240px_1fr] lg:gap-4">
-				@sidebars.Sidebar(sportsList)
-				<main id="main-content" class="bg-gray-100">
-					{ children... }
+		<body class="h-full flex overflow-hidden antialiased font-sans text-neutral-800 bg-neutral-100">
+			@sidebars.Sidebar(sportsList)
+			<div class="flex-1 flex flex-col min-w-0 h-full">
+				@topbars.Topbar(title)
+				<main
+					id="main-content"
+					class="flex-1 w-full bg-neutral-200 text-neutral-800 rounded-tl-2xl overflow-y-auto relative"
+				>
+					<div class="min-h-full">
+						{ children... }
+					</div>
 				</main>
 			</div>
 		</body>

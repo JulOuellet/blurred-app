@@ -26,7 +26,7 @@ templ ChampionshipContent(
 	season *seasons.SeasonModel,
 	events []events.EventModel,
 ) {
-	<div class="p-5 md:p-10">
+	<div class="p-6 space-y-6">
 		@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
 			{Label: sport.Name, URL: "", IsActive: false},
 			{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},

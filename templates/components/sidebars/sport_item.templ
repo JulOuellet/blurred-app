@@ -5,7 +5,7 @@ import "github.com/JulOuellet/blurred-app/internal/domains/seasons"
 templ SportItem(name string, seasons []seasons.SeasonModel) {
 	<details class="group [&_summary::-webkit-details-marker]:hidden">
 		<summary
-			class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+			class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-800"
 		>
 			<span class="text-sm font-medium">{ name }</span>
 			<span class="shrink-0 transition duration-300 group-open:-rotate-180">
@@ -23,7 +23,7 @@ templ SportItem(name string, seasons []seasons.SeasonModel) {
 				</svg>
 			</span>
 		</summary>
-		<ul class="mt-2 space-y-1 px-4">
+		<ul class="mt-2 space-y-1 px-4 list-none">
 			@SeasonsList(seasons)
 		</ul>
 	</details>
