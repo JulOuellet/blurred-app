@@ -1,6 +1,7 @@
 package sidebars
 
 import "github.com/JulOuellet/blurred-app/internal/domains/sports"
+import "github.com/JulOuellet/blurred-app/templates/components/logos"
 
 templ Sidebar(sportsList []sports.SportWithSeasons) {
 	<aside class="w-64 flex flex-col shrink-0 bg-neutral-100">
@@ -11,9 +12,9 @@ templ Sidebar(sportsList []sports.SportWithSeasons) {
 				hx-target="#main-content"
 				hx-swap="innerHTML"
 				hx-push-url="true"
-				class="text-5xl font-bold text-neutral-800 tracking-tight cursor-pointer"
+				class="cursor-pointer text-neutral-800 hover:text-neutral-600 transition-colors"
 			>
-				B
+				@logos.Logo("h-10 w-auto")
 			</a>
 		</div>
 		<div class="flex-1 overflow-y-auto px-4 py-4">
