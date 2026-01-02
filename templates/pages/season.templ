@@ -13,7 +13,7 @@ templ SeasonPage(
 	sport sports.SportModel,
 	sportsList []sports.SportWithSeasons,
 ) {
-	@layouts.Base("Season - "+season.Name, sportsList) {
+	@layouts.Base(sport.Name+" - "+season.Name, sportsList) {
 		@SeasonContent(season, championships, sport)
 	}
 }
@@ -23,6 +23,7 @@ templ SeasonContent(
 	championships []championships.ChampionshipModel,
 	sport sports.SportModel,
 ) {
+	<title hx-head="merge">{ sport.Name + " - " + season.Name }</title>
 	<div class="p-6 space-y-6">
 		@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
 			{Label: sport.Name, URL: "", IsActive: false},

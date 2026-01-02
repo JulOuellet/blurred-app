@@ -29,6 +29,7 @@ templ EventContent(
 	event *events.EventModel,
 	highlights []highlights.HighlightModel,
 ) {
+	<title hx-head="merge">{ event.Name }</title>
 	<div class="p-6 space-y-6">
 		@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
 			{Label: sport.Name, URL: "", IsActive: false},

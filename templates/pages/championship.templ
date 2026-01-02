@@ -26,6 +26,7 @@ templ ChampionshipContent(
 	season *seasons.SeasonModel,
 	events []events.EventModel,
 ) {
+	<title hx-head="merge">{ championship.Name }</title>
 	<div class="p-6 space-y-6">
 		@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
 			{Label: sport.Name, URL: "", IsActive: false},

@@ -11,6 +11,7 @@ templ HomePage(sportsList []sports.SportWithSeasons) {
 }
 
 templ HomeContent() {
+	<title hx-head="merge">Blurred</title>
 	<div class="relative overflow-hidden bg-[url(https://images.unsplash.com/photo-1525284837422-f027637f3ac3)] bg-cover bg-top bg-no-repeat h-screen">
 		<div class="absolute top-1/2 left-0 right-0 w-full h-96 -translate-y-1/2 bg-white/30 backdrop-blur-sm flex flex-col justify-center items-end px-12">
 			<div class="flex flex-col items-start">

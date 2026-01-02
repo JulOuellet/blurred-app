@@ -424,13 +424,6 @@
     border-style: var(--tw-border-style);
     border-width: 1px;
   }
-  .border-b {
-    border-bottom-style: var(--tw-border-style);
-    border-bottom-width: 1px;
-  }
-  .border-neutral-200 {
-    border-color: var(--color-neutral-200);
-  }
   .border-neutral-300 {
     border-color: var(--color-neutral-300);
   }
