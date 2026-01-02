@@ -5,7 +5,7 @@ import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 import "github.com/JulOuellet/blurred-app/templates/components/logos"
 
 templ HomePage(sportsList []sports.SportWithSeasons) {
-	@layouts.Base("Blurred", sportsList) {
+	@layouts.Base("Blurred", sportsList, "") {
 		@HomeContent()
 	}
 }

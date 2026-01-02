@@ -6,6 +6,7 @@ import (
 	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
+	"github.com/JulOuellet/blurred-app/templates/components/sidebars"
 	"github.com/JulOuellet/blurred-app/templates/pages"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -58,7 +59,11 @@ func (h *SeasonPageHandler) GetSeason(c echo.Context) error {
 	}
 
 	if c.Request().Header.Get("HX-Request") == "true" {
-		return pages.SeasonContent(season, championships, *sport).Render(c.Request().Context(), c.Response().Writer)
+		err = pages.SeasonContent(season, championships, *sport).Render(c.Request().Context(), c.Response().Writer)
+		if err != nil {
+			return err
+		}
+		return sidebars.Sidebar(sportsList, season.ID.String(), true).Render(c.Request().Context(), c.Response().Writer)
 	}
 
 	return pages.SeasonPage(season, championships, *sport, sportsList).Render(c.Request().Context(), c.Response().Writer)

@@ -13,7 +13,7 @@ templ SeasonPage(
 	sport sports.SportModel,
 	sportsList []sports.SportWithSeasons,
 ) {
-	@layouts.Base(sport.Name+" - "+season.Name, sportsList) {
+	@layouts.Base(sport.Name+" - "+season.Name, sportsList, season.ID.String()) {
 		@SeasonContent(season, championships, sport)
 	}
 }

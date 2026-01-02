@@ -2,10 +2,10 @@ package sidebars
 
 import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 
-templ SportsList(sportsList []sports.SportWithSeasons) {
+templ SportsList(sportsList []sports.SportWithSeasons, activeID string) {
 	for _, sport := range sportsList {
 		<li>
-			@SportItem(sport.Name, sport.Seasons)
+			@SportItem(sport.Name, sport.Seasons, activeID)
 		</li>
 	}
 }

@@ -2,8 +2,17 @@ package sidebars
 
 import "github.com/JulOuellet/blurred-app/internal/domains/seasons"
 
-templ SportItem(name string, seasons []seasons.SeasonModel) {
-	<details class="group [&_summary::-webkit-details-marker]:hidden">
+templ SportItem(name string, seasons []seasons.SeasonModel, activeID string) {
+	{{
+		isOpen := false
+		for _, s := range seasons {
+			if s.ID.String() == activeID {
+				isOpen = true
+				break
+			}
+		}
+	}}
+	<details class="group [&_summary::-webkit-details-marker]:hidden" open?={ isOpen }>
 		<summary
 			class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-800"
 		>
@@ -24,7 +33,7 @@ templ SportItem(name string, seasons []seasons.SeasonModel) {
 			</span>
 		</summary>
 		<ul class="mt-2 space-y-1 px-4 list-none">
-			@SeasonsList(seasons)
+			@SeasonsList(seasons, activeID)
 		</ul>
 	</details>
 }

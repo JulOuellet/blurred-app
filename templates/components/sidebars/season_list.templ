@@ -2,10 +2,10 @@ package sidebars
 
 import "github.com/JulOuellet/blurred-app/internal/domains/seasons"
 
-templ SeasonsList(seasonList []seasons.SeasonModel) {
+templ SeasonsList(seasonList []seasons.SeasonModel, activeID string) {
 	for _, season := range seasonList {
 		<li>
-			@SeasonItem(season)
+			@SeasonItem(season, season.ID.String() == activeID)
 		</li>
 	}
 }

@@ -15,7 +15,7 @@ templ ChampionshipPage(
 	events []events.EventModel,
 	sportsList []sports.SportWithSeasons,
 ) {
-	@layouts.Base(championship.Name, sportsList) {
+	@layouts.Base(championship.Name, sportsList, season.ID.String()) {
 		@ChampionshipContent(championship, sport, season, events)
 	}
 }

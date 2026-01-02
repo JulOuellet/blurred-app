@@ -2,14 +2,16 @@ package sidebars
 
 import "github.com/JulOuellet/blurred-app/internal/domains/seasons"
 
-templ SeasonItem(season seasons.SeasonModel) {
+templ SeasonItem(season seasons.SeasonModel, isActive bool) {
 	<a
 		href={ templ.SafeURL("/seasons/" + season.ID.String()) }
 		hx-get={ templ.SafeURL("/seasons/" + season.ID.String()) }
 		hx-target="#main-content"
 		hx-swap="innerHTML"
 		hx-push-url="true"
-		class="block rounded-lg px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200 hover:text-neutral-800"
+		class={ "block rounded-lg px-4 py-2 text-sm font-medium hover:bg-neutral-200 hover:text-neutral-800",
+			templ.KV("bg-neutral-200 text-neutral-800", isActive),
+			templ.KV("text-neutral-600", !isActive) }
 	>
 		{ season.Name }
 	</a>
