@@ -26,7 +26,7 @@ COPY . .
 RUN templ generate
 
 # 6. Generate Tailwind CSS
-RUN tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css -c tailwind.config.js --minify
+RUN tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
 
 # 7. Build Go Binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
