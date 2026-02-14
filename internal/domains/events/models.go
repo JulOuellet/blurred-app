@@ -20,3 +20,10 @@ type EventRequest struct {
 	Date           *time.Time `json:"date"`
 	ChampionshipID uuid.UUID  `json:"championshipId"`
 }
+
+type RecentEvent struct {
+	EventModel
+	ChampionshipName string    `db:"championship_name"`
+	SportName        string    `db:"sport_name"`
+	SeasonID         uuid.UUID `db:"season_id"`
+}
