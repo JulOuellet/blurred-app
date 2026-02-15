@@ -1,6 +1,22 @@
-package cards 
+package cards
 
-import "github.com/JulOuellet/blurred-app/internal/domains/championships"
+import (
+	"github.com/JulOuellet/blurred-app/internal/domains/championships"
+	"time"
+)
+
+func formatDateRange(start, end *time.Time) string {
+	if start == nil {
+		return "TBD"
+	}
+	if end == nil || (start.Year() == end.Year() && start.YearDay() == end.YearDay()) {
+		return start.Format("January 2")
+	}
+	if start.Month() == end.Month() {
+		return start.Format("January 2") + " – " + end.Format("2")
+	}
+	return start.Format("January 2") + " – " + end.Format("January 2")
+}
 
 templ ChampionshipCard(championship championships.ChampionshipModel) {
 	<a
@@ -9,17 +25,17 @@ templ ChampionshipCard(championship championships.ChampionshipModel) {
 		hx-target="#main-content"
 		hx-swap="innerHTML"
 		hx-push-url="true"
-		class="group relative block rounded-xl shadow-lg overflow-hidden bg-black"
+		class="group relative block aspect-video rounded-xl shadow-lg overflow-hidden bg-black"
 	>
-		<img alt="" src={ championship.ReferenceImgURL } class="w-full h-auto object-cover opacity-75 transition-opacity group-hover:opacity-50"/>
-		<div class="absolute inset-0 p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+		<img alt="" src={ championship.ReferenceImgURL } class="absolute inset-0 w-full h-full object-cover opacity-75 transition-opacity group-hover:opacity-50"/>
+		<div class="absolute inset-0 p-4 sm:p-6 flex flex-col justify-between">
 			<div>
-				<p class="text-sm font-semibold tracking-widest text-pink-500 uppercase">{ *championship.Organization }</p>
-				<p class="text-xl font-bold text-white sm:text-3xl">{ championship.Name }</p>
+				<p class="text-xs font-semibold tracking-widest text-pink-500 uppercase">{ formatDateRange(championship.StartDate, championship.EndDate) }</p>
+				<p class="text-lg font-bold text-white sm:text-xl line-clamp-2">{ championship.Name }</p>
 			</div>
 			<div>
 				<div class="translate-y-8 transform opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
-					<p class="text-sm text-white font-bold">{ *championship.Description }</p>
+					<p class="text-sm text-white font-bold line-clamp-4">{ *championship.Description }</p>
 				</div>
 			</div>
 		</div>

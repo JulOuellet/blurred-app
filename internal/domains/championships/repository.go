@@ -153,7 +153,7 @@ func (r *championshipRepository) GetAllBySeasonId(seasonId uuid.UUID) ([]Champio
 		WHERE
 		  season_id = $1
 		ORDER BY
-		  start_date DESC
+		  start_date ASC
 	`
 
 	var championships []ChampionshipModel
