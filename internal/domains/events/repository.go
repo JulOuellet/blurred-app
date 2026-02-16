@@ -17,7 +17,6 @@ type EventRepository interface {
 		championshipId uuid.UUID,
 	) (*EventModel, error)
 	GetAllByChampionshipId(championshipId uuid.UUID, sortBy SortBy, sortDirection SortDirection) ([]EventModel, error)
-	GetRecent(limit int) ([]RecentEvent, error)
 }
 
 type eventRepository struct {
