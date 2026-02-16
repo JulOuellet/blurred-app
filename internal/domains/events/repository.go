@@ -1,6 +1,7 @@
 package events
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,7 +16,7 @@ type EventRepository interface {
 		date *time.Time,
 		championshipId uuid.UUID,
 	) (*EventModel, error)
-	GetAllByChampionshipId(championshipId uuid.UUID) ([]EventModel, error)
+	GetAllByChampionshipId(championshipId uuid.UUID, sortBy SortBy, sortDirection SortDirection) ([]EventModel, error)
 	GetRecent(limit int) ([]RecentEvent, error)
 }
 
@@ -103,8 +104,8 @@ func (r *eventRepository) Create(
 	return &event, nil
 }
 
-func (r *eventRepository) GetAllByChampionshipId(championshipId uuid.UUID) ([]EventModel, error) {
-	query := `
+func (r *eventRepository) GetAllByChampionshipId(championshipId uuid.UUID, sortBy SortBy, sortDirection SortDirection) ([]EventModel, error) {
+	query := fmt.Sprintf(`
 	    SELECT
 		  id,
 		  name,
@@ -117,34 +118,9 @@ func (r *eventRepository) GetAllByChampionshipId(championshipId uuid.UUID) ([]Ev
 		WHERE
 		  championship_id = $1
 		ORDER BY
-		  date DESC
-	`
+		  %s %s
+	`, sortBy.Column(), sortDirection)
 	var events []EventModel
 	err := r.db.Select(&events, query, championshipId)
-	return events, err
-}
-
-func (r *eventRepository) GetRecent(limit int) ([]RecentEvent, error) {
-	query := `
-		SELECT
-		  e.id,
-		  e.name,
-		  e.date,
-		  e.championship_id,
-		  e.created_at,
-		  e.updated_at,
-		  c.name AS championship_name,
-		  sp.name AS sport_name,
-		  s.id AS season_id
-		FROM events e
-		JOIN championships c ON e.championship_id = c.id
-		JOIN seasons s ON c.season_id = s.id
-		JOIN sports sp ON s.sport_id = sp.id
-		WHERE e.date IS NOT NULL
-		ORDER BY ABS(EXTRACT(EPOCH FROM (e.date - NOW())))
-		LIMIT $1
-	`
-	var events []RecentEvent
-	err := r.db.Select(&events, query, limit)
 	return events, err
 }

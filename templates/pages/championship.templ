@@ -7,16 +7,17 @@ import "github.com/JulOuellet/blurred-app/internal/domains/events"
 import "github.com/JulOuellet/blurred-app/templates/components/breadcrumbs"
 import "github.com/JulOuellet/blurred-app/templates/components/cards"
 import "github.com/JulOuellet/blurred-app/templates/layouts"
+import "fmt"
 
 templ ChampionshipPage(
 	championship *championships.ChampionshipModel,
 	sport *sports.SportModel,
 	season *seasons.SeasonModel,
-	events []events.EventModel,
+	evts []events.EventModel,
 	sportsList []sports.SportWithSeasons,
 ) {
 	@layouts.Base(championship.Name, sportsList, season.ID.String()) {
-		@ChampionshipContent(championship, sport, season, events)
+		@ChampionshipContent(championship, sport, season, evts)
 	}
 }
 
@@ -24,7 +25,7 @@ templ ChampionshipContent(
 	championship *championships.ChampionshipModel,
 	sport *sports.SportModel,
 	season *seasons.SeasonModel,
-	events []events.EventModel,
+	evts []events.EventModel,
 ) {
 	<title hx-head="merge">{ championship.Name }</title>
 	<div class="p-6 space-y-6">
@@ -33,7 +34,42 @@ templ ChampionshipContent(
 			{Label: season.Name, URL: "/seasons/" + season.ID.String(), IsActive: false},
 			{Label: championship.Name, URL: "", IsActive: true},
 		})
-		for _, event := range events {
+		@EventsList(championship.ID.String(), evts, events.SortByDate, events.SortDirectionDesc)
+	</div>
+}
+
+templ EventsList(championshipId string, evts []events.EventModel, sortBy events.SortBy, sortDirection events.SortDirection) {
+	<div id="events-list">
+		if len(evts) > 0 {
+			<div class="max-w-4xl mx-auto flex justify-end mb-4">
+				if sortDirection == events.SortDirectionDesc {
+					<button
+						hx-get={ fmt.Sprintf("/championships/%s/events?sortBy=%s&sortDirection=asc", championshipId, sortBy) }
+						hx-target="#events-list"
+						hx-swap="outerHTML"
+						class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-neutral-600 bg-white rounded-md shadow hover:bg-neutral-50 transition-colors cursor-pointer"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h5m4 0l4-4m0 0l4 4m-4-4v12"></path>
+						</svg>
+						Newest first
+					</button>
+				} else {
+					<button
+						hx-get={ fmt.Sprintf("/championships/%s/events?sortBy=%s&sortDirection=desc", championshipId, sortBy) }
+						hx-target="#events-list"
+						hx-swap="outerHTML"
+						class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-neutral-600 bg-white rounded-md shadow hover:bg-neutral-50 transition-colors cursor-pointer"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h9m-4 4l4 4m0 0l4-4m-4 4V4"></path>
+						</svg>
+						Oldest first
+					</button>
+				}
+			</div>
+		}
+		for _, event := range evts {
 			@cards.EventCard(event)
 		}
 	</div>

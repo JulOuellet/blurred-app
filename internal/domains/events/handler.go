@@ -68,7 +68,7 @@ func (h *eventHandler) GetAllByChampionshipId(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid championship ID format")
 	}
 
-	events, err := h.eventService.GetAllByChampionshipId(championshipId)
+	events, err := h.eventService.GetAllByChampionshipId(championshipId, SortByDate, SortDirectionDesc)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get events")
 	}
