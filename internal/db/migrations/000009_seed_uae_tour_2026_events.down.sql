@@ -1,0 +1,2 @@
+DELETE FROM events
+WHERE championship_id = '10000000-2026-4000-a000-000000000021';
