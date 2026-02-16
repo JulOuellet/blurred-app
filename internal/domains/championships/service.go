@@ -12,6 +12,8 @@ type ChampionshipService interface {
 	GetById(id uuid.UUID) (*ChampionshipModel, error)
 	Create(req ChampionshipRequest) (*ChampionshipModel, error)
 	GetAllBySeasonId(seasonId uuid.UUID) ([]ChampionshipModel, error)
+	GetOngoing() ([]HomeChampionship, error)
+	GetUpcoming(limit int) ([]HomeChampionship, error)
 }
 
 type championshipService struct {
@@ -32,6 +34,14 @@ func (s *championshipService) GetById(id uuid.UUID) (*ChampionshipModel, error) 
 
 func (s *championshipService) GetAllBySeasonId(seasonId uuid.UUID) ([]ChampionshipModel, error) {
 	return s.championshipRepo.GetAllBySeasonId(seasonId)
+}
+
+func (s *championshipService) GetOngoing() ([]HomeChampionship, error) {
+	return s.championshipRepo.GetOngoing()
+}
+
+func (s *championshipService) GetUpcoming(limit int) ([]HomeChampionship, error) {
+	return s.championshipRepo.GetUpcoming(limit)
 }
 
 func (s *championshipService) Create(req ChampionshipRequest) (*ChampionshipModel, error) {

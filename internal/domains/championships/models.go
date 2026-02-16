@@ -19,6 +19,11 @@ type ChampionshipModel struct {
 	UpdatedAt       time.Time  `json:"updatedAt" db:"updated_at"`
 }
 
+type HomeChampionship struct {
+	ChampionshipModel
+	SportName string `db:"sport_name"`
+}
+
 type ChampionshipsByMonth struct {
 	Month         string
 	Championships []ChampionshipModel

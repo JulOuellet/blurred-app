@@ -57,7 +57,7 @@ func (h *ChampionshipPageHandler) GetChampionship(c echo.Context) error {
 		return c.String(http.StatusNotFound, "Sport not found")
 	}
 
-	events, err := h.eventService.GetAllByChampionshipId(id)
+	evts, err := h.eventService.GetAllByChampionshipId(id, events.SortByDate, events.SortDirectionDesc)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "Failed to retrieve events")
 	}
@@ -68,12 +68,33 @@ func (h *ChampionshipPageHandler) GetChampionship(c echo.Context) error {
 	}
 
 	if c.Request().Header.Get("HX-Request") == "true" {
-		err = pages.ChampionshipContent(championship, sport, season, events).Render(c.Request().Context(), c.Response().Writer)
+		err = pages.ChampionshipContent(championship, sport, season, evts).Render(c.Request().Context(), c.Response().Writer)
 		if err != nil {
 			return err
 		}
 		return sidebars.Sidebar(sportsList, season.ID.String(), true).Render(c.Request().Context(), c.Response().Writer)
 	}
 
-	return pages.ChampionshipPage(championship, sport, season, events, sportsList).Render(c.Request().Context(), c.Response().Writer)
+	return pages.ChampionshipPage(championship, sport, season, evts, sportsList).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *ChampionshipPageHandler) GetChampionshipEvents(c echo.Context) error {
+	idStr := c.Param("id")
+
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Invalid championship ID")
+	}
+
+	sortBy, sortDirection := events.NewSortOptions(
+		c.QueryParam("sortBy"),
+		c.QueryParam("sortDirection"),
+	)
+
+	evts, err := h.eventService.GetAllByChampionshipId(id, sortBy, sortDirection)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to retrieve events")
+	}
+
+	return pages.EventsList(idStr, evts, sortBy, sortDirection).Render(c.Request().Context(), c.Response().Writer)
 }

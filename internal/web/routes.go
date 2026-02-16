@@ -72,7 +72,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		championshipService,
 		sportService,
 	)
-	homePageHandler := pages.NewHomePageHandler(sportService, eventService)
+	homePageHandler := pages.NewHomePageHandler(sportService, championshipService)
 	e.GET("/", homePageHandler.GetHome)
 	e.GET("/seasons/:id", seasonPageHandler.GetSeason)
 
@@ -83,6 +83,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		eventService,
 	)
 	e.GET("/championships/:id", championshipPageHandler.GetChampionship)
+	e.GET("/championships/:id/events", championshipPageHandler.GetChampionshipEvents)
 
 	eventPageHandler := pages.NewEventPageHandler(
 		championshipService,

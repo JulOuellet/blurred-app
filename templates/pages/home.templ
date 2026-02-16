@@ -2,17 +2,18 @@ package pages
 
 import "github.com/JulOuellet/blurred-app/templates/layouts"
 import "github.com/JulOuellet/blurred-app/internal/domains/sports"
-import "github.com/JulOuellet/blurred-app/internal/domains/events"
+import "github.com/JulOuellet/blurred-app/internal/domains/championships"
 import "github.com/JulOuellet/blurred-app/templates/components/logos"
+import "github.com/JulOuellet/blurred-app/templates/components/cards"
 import "fmt"
 
-templ HomePage(sportsList []sports.SportWithSeasons, recentEvents []events.RecentEvent) {
+templ HomePage(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship) {
 	@layouts.Base("Blurred", sportsList, "") {
-		@HomeContent(sportsList, recentEvents)
+		@HomeContent(sportsList, ongoingChampionships, upcomingChampionships)
 	}
 }
 
-templ HomeContent(sportsList []sports.SportWithSeasons, recentEvents []events.RecentEvent) {
+templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship) {
 	<title hx-head="merge">Blurred</title>
 	<div class="p-6 space-y-8">
 		<!-- Compact Hero -->
@@ -55,34 +56,48 @@ templ HomeContent(sportsList []sports.SportWithSeasons, recentEvents []events.Re
 				}
 			</div>
 		</section>
-		<!-- Recent & Upcoming Events -->
-		if len(recentEvents) > 0 {
+		<!-- Ongoing Championships -->
+		if len(ongoingChampionships) > 0 {
 			<section>
-				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Recent & upcoming events</h2>
+				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Ongoing championships</h2>
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+					for _, champ := range ongoingChampionships {
+						<div>
+							<p class="text-xs font-medium text-neutral-500 mb-1">{ champ.SportName }</p>
+							@cards.ChampionshipCard(champ.ChampionshipModel)
+						</div>
+					}
+				</div>
+			</section>
+		}
+		<!-- Upcoming Championships -->
+		if len(upcomingChampionships) > 0 {
+			<section>
+				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Upcoming championships</h2>
 				<div class="space-y-3">
-					for _, event := range recentEvents {
+					for _, champ := range upcomingChampionships {
 						<a
-							href={ templ.SafeURL("/events/" + event.ID.String()) }
-							hx-get={ templ.SafeURL("/events/" + event.ID.String()) }
+							href={ templ.SafeURL("/championships/" + champ.ID.String()) }
+							hx-get={ templ.SafeURL("/championships/" + champ.ID.String()) }
 							hx-target="#main-content"
 							hx-swap="innerHTML"
 							hx-push-url="true"
 							class="flex items-center gap-4 p-4 bg-white rounded-xl shadow hover:shadow-md hover:bg-neutral-50 transition-all"
 						>
 							<div class="flex-shrink-0 w-14 h-14 rounded-lg bg-neutral-100 flex flex-col items-center justify-center text-center">
-								if event.Date != nil {
+								if champ.StartDate != nil {
 									<span class="text-xs font-semibold text-pink-500 uppercase leading-none">
-										{ event.Date.Format("Jan") }
+										{ champ.StartDate.Format("Jan") }
 									</span>
 									<span class="text-lg font-bold text-neutral-800 leading-tight">
-										{ event.Date.Format("02") }
+										{ champ.StartDate.Format("02") }
 									</span>
 								}
 							</div>
 							<div class="flex-1 min-w-0">
-								<h3 class="text-sm font-semibold text-neutral-800 truncate">{ event.Name }</h3>
+								<h3 class="text-sm font-semibold text-neutral-800 truncate">{ champ.Name }</h3>
 								<p class="text-xs text-neutral-500 truncate">
-									{ event.ChampionshipName } · { event.SportName }
+									{ champ.SportName }
 								</p>
 							</div>
 							<svg class="flex-shrink-0 w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
