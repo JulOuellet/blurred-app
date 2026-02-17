@@ -1,0 +1,71 @@
+package pages
+
+import "github.com/JulOuellet/blurred-app/templates/layouts"
+import "github.com/JulOuellet/blurred-app/internal/domains/sports"
+import "github.com/JulOuellet/blurred-app/templates/components/logos"
+
+templ AboutPage(sportsList []sports.SportWithSeasons) {
+	@layouts.Base("About - Blurred", sportsList, "") {
+		@AboutContent()
+	}
+}
+
+templ AboutContent() {
+	<title hx-head="merge">About - Blurred</title>
+	<div class="p-6 max-w-2xl mx-auto space-y-10">
+		<!-- Header -->
+		<div class="flex flex-col items-center text-center space-y-3">
+			<div class="text-neutral-800">
+				@logos.BlurredLogo("h-14 w-auto")
+			</div>
+			<p class="text-neutral-500 text-lg font-medium">
+				A spoiler-free sports highlights browser
+			</p>
+		</div>
+		<!-- What is Blurred -->
+		<section class="space-y-2">
+			<h2 class="text-lg font-semibold text-neutral-700">What is Blurred?</h2>
+			<p class="text-neutral-600 leading-relaxed">
+				Blurred is a spoiler-free platform for browsing and watching sports highlights.
+				All thumbnails are blurred by default, allowing you to explore events and choose
+				what to watch without having results revealed in advance.
+			</p>
+		</section>
+		<!-- Why Blurred -->
+		<section class="space-y-2">
+			<h2 class="text-lg font-semibold text-neutral-700">Why Blurred?</h2>
+			<p class="text-neutral-600 leading-relaxed">
+				Sports highlights are scattered across the internet, and finding them often means
+				encountering spoilers along the way. Blurred brings everything together in one place
+				so you can catch up on events on your own schedule, spoiler-free.
+			</p>
+		</section>
+		<!-- How it works -->
+		<section class="space-y-2">
+			<h2 class="text-lg font-semibold text-neutral-700">How it works</h2>
+			<p class="text-neutral-600 leading-relaxed">
+				Browse by sport, season, or championship. Highlight thumbnails stay blurred until
+				you decide to watch. Click any highlight to play it directly.
+			</p>
+		</section>
+		<!-- Open source -->
+		<section class="space-y-2">
+			<h2 class="text-lg font-semibold text-neutral-700">Open source</h2>
+			<p class="text-neutral-600 leading-relaxed">
+				Blurred is an open-source project developed and maintained by a single developer.
+				The source code is available on
+				<a
+					href="https://github.com/JulOuellet/blurred-app"
+					target="_blank"
+					class="text-pink-500 hover:text-pink-600 underline underline-offset-2"
+				>GitHub</a>.
+				Bug reports, feature requests, and feedback are welcome via
+				<a
+					href="https://github.com/JulOuellet/blurred-app/issues"
+					target="_blank"
+					class="text-pink-500 hover:text-pink-600 underline underline-offset-2"
+				>GitHub Issues</a>.
+			</p>
+		</section>
+	</div>
+}

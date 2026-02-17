@@ -94,5 +94,8 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	)
 	e.GET("/events/:id", eventPageHandler.GetEvent)
 
+	aboutPageHandler := pages.NewAboutPageHandler(sportService)
+	e.GET("/about", aboutPageHandler.GetAbout)
+
 	return e
 }

@@ -8,7 +8,17 @@ templ Topbar(title string) {
 		<div class="w-1/3 flex justify-center">
 			<!-- @searchbars.Searchbar() -->
 		</div>
-		<div class="w-1/3 flex justify-end">
+		<div class="w-1/3 flex justify-end items-center gap-4">
+			<a
+				href="/about"
+				hx-get="/about"
+				hx-target="#main-content"
+				hx-swap="innerHTML"
+				hx-push-url="true"
+				class="text-sm font-medium text-neutral-600 hover:text-neutral-800 transition-colors"
+			>
+				About
+			</a>
 			<a
 				href="https://github.com/JulOuellet/blurred-app"
 				target="_blank"
