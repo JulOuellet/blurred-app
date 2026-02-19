@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
 	"github.com/JulOuellet/blurred-app/internal/db"
 	"github.com/JulOuellet/blurred-app/internal/web"
+	"github.com/JulOuellet/blurred-app/internal/worker"
 )
 
 func main() {
@@ -18,6 +20,15 @@ func main() {
 
 	database := db.Init(dbUrl, migrationPath)
 	defer database.Close()
+
+	youtubeAPIKey := os.Getenv("YOUTUBE_API_KEY")
+	if youtubeAPIKey != "" {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		w := worker.New(database, youtubeAPIKey)
+		w.Run(ctx)
+		log.Println("YouTube integration worker started")
+	}
 
 	e := web.RegisterRoutes(database)
 

@@ -20,6 +20,7 @@ type HighlightRepository interface {
 		eventID uuid.UUID,
 	) (*HighlightModel, error)
 	GetAllByEventId(eventId uuid.UUID) ([]HighlightModel, error)
+	ExistsByYoutubeID(youtubeID string) (bool, error)
 }
 
 type highlightRepository struct {
@@ -167,4 +168,11 @@ func (r *highlightRepository) GetAllByEventId(eventId uuid.UUID) ([]HighlightMod
 	var highlights []HighlightModel
 	err := r.db.Select(&highlights, query, eventId)
 	return highlights, err
+}
+
+func (r *highlightRepository) ExistsByYoutubeID(youtubeID string) (bool, error) {
+	query := `SELECT EXISTS(SELECT 1 FROM highlights WHERE youtube_id = $1)`
+	var exists bool
+	err := r.db.Get(&exists, query, youtubeID)
+	return exists, err
 }

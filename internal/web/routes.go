@@ -4,6 +4,7 @@ import (
 	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
 	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
+	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/internal/web/handlers/pages"
@@ -24,12 +25,14 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	championshipRepository := championships.NewChampionshipRepository(db)
 	eventRepository := events.NewEventRepository(db)
 	highlightRepository := highlights.NewHighlightRepository(db)
+	integrationRepository := integrations.NewIntegrationRepository(db)
 
 	sportService := sports.NewSportService(sportRepository, seasonRepository)
 	seasonService := seasons.NewSeasonService(seasonRepository)
 	championshipService := championships.NewChampionshipService(championshipRepository)
 	eventService := events.NewEventService(eventRepository)
 	highlightService := highlights.NewHighlightService(highlightRepository)
+	integrationService := integrations.NewIntegrationService(integrationRepository)
 
 	api := e.Group("/api")
 	{
@@ -65,6 +68,12 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		highlightsApi.GET("/:id", highlightHandler.GetById)
 		highlightsApi.POST("", highlightHandler.Create)
 		highlightsApi.GET("/event/:id", highlightHandler.GetAllByEventId)
+
+		integrationHandler := integrations.NewIntegrationHandler(integrationService)
+		integrationsApi := api.Group("/integrations")
+		integrationsApi.GET("", integrationHandler.GetAll)
+		integrationsApi.GET("/:id", integrationHandler.GetById)
+		integrationsApi.POST("", integrationHandler.Create)
 	}
 
 	seasonPageHandler := pages.NewSeasonPageHandler(
