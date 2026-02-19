@@ -13,6 +13,16 @@ const (
 	LangEnglishCA Language = "en-CA"
 )
 
+func IsValidLanguage(s string) bool {
+	switch Language(s) {
+	case LangFrenchCA, LangFrenchFR, LangFrenchBE, LangFrenchCH,
+		LangEnglishUS, LangEnglishGB, LangEnglishAU, LangEnglishCA:
+		return true
+	default:
+		return false
+	}
+}
+
 func (l Language) DisplayName() string {
 	switch l {
 	case LangFrenchCA:

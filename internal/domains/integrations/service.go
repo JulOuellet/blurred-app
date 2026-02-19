@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
 	"github.com/google/uuid"
 )
 
@@ -44,6 +45,9 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 	lang := strings.TrimSpace(req.Lang)
 	if lang == "" {
 		return nil, fmt.Errorf("language cannot be empty")
+	}
+	if !highlights.IsValidLanguage(lang) {
+		return nil, fmt.Errorf("invalid language %q: must be a valid language code (e.g. en-GB, fr-FR)", lang)
 	}
 
 	relevancePattern := strings.TrimSpace(req.RelevancePattern)
