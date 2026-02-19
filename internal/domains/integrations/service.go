@@ -71,14 +71,12 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 	}
 
 	youtubeChannelName := strings.TrimSpace(req.YoutubeChannelName)
-	source := strings.TrimSpace(req.Source)
 
 	return s.integrationRepo.Create(
 		youtubeChannelID,
 		youtubeChannelName,
 		req.ChampionshipID,
 		lang,
-		source,
 		relevancePattern,
 		eventPattern,
 	)

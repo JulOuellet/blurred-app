@@ -16,7 +16,6 @@ type IntegrationRepository interface {
 		youtubeChannelName string,
 		championshipID uuid.UUID,
 		lang string,
-		source string,
 		relevancePattern string,
 		eventPattern string,
 	) (*IntegrationModel, error)
@@ -39,7 +38,6 @@ func (r *integrationRepository) GetAll() ([]IntegrationModel, error) {
 		  youtube_channel_name,
 		  championship_id,
 		  lang,
-		  source,
 		  relevance_pattern,
 		  event_pattern,
 		  active,
@@ -63,7 +61,6 @@ func (r *integrationRepository) GetById(id uuid.UUID) (*IntegrationModel, error)
 		  youtube_channel_name,
 		  championship_id,
 		  lang,
-		  source,
 		  relevance_pattern,
 		  event_pattern,
 		  active,
@@ -91,7 +88,6 @@ func (r *integrationRepository) GetAllActive() ([]IntegrationModel, error) {
 		  i.youtube_channel_name,
 		  i.championship_id,
 		  i.lang,
-		  i.source,
 		  i.relevance_pattern,
 		  i.event_pattern,
 		  i.active,
@@ -117,7 +113,6 @@ func (r *integrationRepository) Create(
 	youtubeChannelName string,
 	championshipID uuid.UUID,
 	lang string,
-	source string,
 	relevancePattern string,
 	eventPattern string,
 ) (*IntegrationModel, error) {
@@ -128,19 +123,17 @@ func (r *integrationRepository) Create(
 			youtube_channel_name,
 			championship_id,
 			lang,
-			source,
 			relevance_pattern,
 			event_pattern
 		  )
 		VALUES
-		  ($1, $2, $3, $4, $5, $6, $7)
+		  ($1, $2, $3, $4, $5, $6)
 		RETURNING
 		  id,
 		  youtube_channel_id,
 		  youtube_channel_name,
 		  championship_id,
 		  lang,
-		  source,
 		  relevance_pattern,
 		  event_pattern,
 		  active,
@@ -156,7 +149,6 @@ func (r *integrationRepository) Create(
 		youtubeChannelName,
 		championshipID,
 		lang,
-		source,
 		relevancePattern,
 		eventPattern,
 	)

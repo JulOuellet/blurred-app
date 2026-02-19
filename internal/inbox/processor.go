@@ -104,8 +104,8 @@ func (p *Processor) ProcessNext() (bool, error) {
 	videoURL := fmt.Sprintf("https://www.youtube.com/watch?v=%s", item.YoutubeVideoID)
 	genericName := fmt.Sprintf("Stage %d Highlights", eventNumber)
 	source := ""
-	if integration.Source != nil {
-		source = *integration.Source
+	if integration.YoutubeChannelName != nil {
+		source = *integration.YoutubeChannelName
 	}
 
 	_, err = p.highlightRepo.Create(

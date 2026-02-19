@@ -12,7 +12,6 @@ type IntegrationModel struct {
 	YoutubeChannelName *string    `json:"youtubeChannelName" db:"youtube_channel_name"`
 	ChampionshipID     uuid.UUID  `json:"championshipId" db:"championship_id"`
 	Lang               string     `json:"lang" db:"lang"`
-	Source             *string    `json:"source" db:"source"`
 	RelevancePattern   string     `json:"relevancePattern" db:"relevance_pattern"`
 	EventPattern       string     `json:"eventPattern" db:"event_pattern"`
 	Active             bool       `json:"active" db:"active"`
@@ -26,7 +25,6 @@ type IntegrationRequest struct {
 	YoutubeChannelName string    `json:"youtubeChannelName"`
 	ChampionshipID     uuid.UUID `json:"championshipId"`
 	Lang               string    `json:"lang"`
-	Source             string    `json:"source"`
 	RelevancePattern   string    `json:"relevancePattern"`
 	EventPattern       string    `json:"eventPattern"`
 }
