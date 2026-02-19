@@ -37,7 +37,7 @@ templ EventContent(
 			{Label: championship.Name, URL: "/championships/" + championship.ID.String(), IsActive: false},
 			{Label: event.Name, URL: "", IsActive: true},
 		})
-		<div class="max-w-4xl mx-auto">
+		<div class="max-w-4xl mx-auto space-y-4">
 			for _, highlight := range highlights {
 				if highlight.MediaType == "VIDEO" && highlight.YoutubeID != nil {
 					@medias.YoutubePlayer(highlight)
