@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/JulOuellet/blurred-app/internal/db"
@@ -11,9 +11,15 @@ import (
 )
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+	slog.SetDefault(logger)
+
 	dbUrl := os.Getenv("DATABASE_URL")
 	if dbUrl == "" {
-		log.Fatal("DATABASE_URL environment variable is not set")
+		slog.Error("DATABASE_URL environment variable is not set")
+		os.Exit(1)
 	}
 
 	migrationPath := "internal/db/migrations"
@@ -27,15 +33,19 @@ func main() {
 		defer cancel()
 		w := worker.New(database, youtubeAPIKey)
 		w.Run(ctx)
-		log.Println("YouTube integration worker started")
+		slog.Info("YouTube integration worker started")
 	}
 
 	e := web.RegisterRoutes(database)
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT environment variable is not set")
+		slog.Error("PORT environment variable is not set")
+		os.Exit(1)
 	}
 
-	log.Fatal(e.Start(":" + port))
+	if err := e.Start(":" + port); err != nil {
+		slog.Error("server failed", "error", err)
+		os.Exit(1)
+	}
 }

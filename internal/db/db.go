@@ -2,7 +2,8 @@ package db
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
+	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -20,14 +21,16 @@ func Init(dbURL, migrationsDir string) *sqlx.DB {
 
 	conn, err := sqlx.Connect("postgres", dbURL)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		slog.Error("failed to connect to database", "error", err)
+		os.Exit(1)
 	}
 
 	if err := conn.Ping(); err != nil {
-		log.Fatalf("Failed to ping database: %v", err)
+		slog.Error("failed to ping database", "error", err)
+		os.Exit(1)
 	}
 
-	log.Println("Database connection established")
+	slog.Info("database connection established")
 	return conn
 }
 
@@ -37,12 +40,14 @@ func applyMigrations(dbURL, migrationsDir string) {
 		dbURL,
 	)
 	if err != nil {
-		log.Fatalf("Failed to create migrate instance: %v", err)
+		slog.Error("failed to create migrate instance", "error", err)
+		os.Exit(1)
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatalf("Failed to run migrations: %v", err)
+		slog.Error("failed to run migrations", "error", err)
+		os.Exit(1)
 	}
 
-	log.Println("Migrations applied successfully")
+	slog.Info("migrations applied successfully")
 }

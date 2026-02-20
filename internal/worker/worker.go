@@ -2,7 +2,7 @@ package worker
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
@@ -48,7 +48,7 @@ func New(db *sqlx.DB, youtubeAPIKey string) *Worker {
 }
 
 func (w *Worker) Run(ctx context.Context) {
-	log.Println("[worker] starting poller and processor")
+	slog.Info("starting poller and processor", "component", "worker")
 	go w.runPoller(ctx)
 	go w.runProcessor(ctx)
 }
@@ -63,7 +63,7 @@ func (w *Worker) runPoller(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("[poller] shutting down")
+			slog.Info("shutting down", "component", "poller")
 			return
 		case <-ticker.C:
 			w.poll()
@@ -74,7 +74,7 @@ func (w *Worker) runPoller(ctx context.Context) {
 func (w *Worker) poll() {
 	activeIntegrations, err := w.integrationRepo.GetAllActive()
 	if err != nil {
-		log.Printf("[poller] failed to get active integrations: %v", err)
+		slog.Error("failed to get active integrations", "component", "poller", "error", err)
 		return
 	}
 
@@ -82,24 +82,24 @@ func (w *Worker) poll() {
 		return
 	}
 
-	log.Printf("[poller] polling %d active integration(s)", len(activeIntegrations))
+	slog.Info("polling active integrations", "component", "poller", "count", len(activeIntegrations))
 
 	for _, integration := range activeIntegrations {
 		entries, err := youtube.FetchFeed(integration.YoutubeChannelID)
 		if err != nil {
-			log.Printf("[poller] failed to fetch feed for channel %s: %v", integration.YoutubeChannelID, err)
+			slog.Error("failed to fetch feed", "component", "poller", "channel", integration.YoutubeChannelID, "error", err)
 			continue
 		}
 
 		for _, entry := range entries {
 			if err := w.inboxRepo.Insert(integration.ID, entry.VideoID, entry.Title, entry.PublishedAt); err != nil {
-				log.Printf("[poller] failed to insert inbox entry for video %s: %v", entry.VideoID, err)
+				slog.Error("failed to insert inbox entry", "component", "poller", "video_id", entry.VideoID, "error", err)
 			}
 		}
 
 		now := time.Now()
 		if err := w.integrationRepo.UpdateLastPolledAt(integration.ID, now); err != nil {
-			log.Printf("[poller] failed to update last_polled_at for integration %s: %v", integration.ID, err)
+			slog.Error("failed to update last_polled_at", "component", "poller", "integration_id", integration.ID, "error", err)
 		}
 	}
 }
@@ -108,12 +108,12 @@ func (w *Worker) runProcessor(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("[processor] shutting down")
+			slog.Info("shutting down", "component", "processor")
 			return
 		default:
 			processed, err := w.processor.ProcessNext()
 			if err != nil {
-				log.Printf("[processor] error: %v", err)
+				slog.Error("processing error", "component", "processor", "error", err)
 				sleep(ctx, processErrorWait)
 				continue
 			}

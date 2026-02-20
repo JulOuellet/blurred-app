@@ -1,6 +1,9 @@
 package web
 
 import (
+	"context"
+	"log/slog"
+
 	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
 	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
@@ -16,7 +19,28 @@ import (
 func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	e := echo.New()
 	e.Static("/assets", "assets")
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus:  true,
+		LogURI:     true,
+		LogMethod:  true,
+		LogLatency: true,
+		LogError:   true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			attrs := []slog.Attr{
+				slog.String("method", v.Method),
+				slog.String("uri", v.URI),
+				slog.Int("status", v.Status),
+				slog.String("latency", v.Latency.String()),
+			}
+			if v.Error != nil {
+				attrs = append(attrs, slog.String("error", v.Error.Error()))
+				slog.LogAttrs(context.Background(), slog.LevelError, "request", attrs...)
+			} else {
+				slog.LogAttrs(context.Background(), slog.LevelInfo, "request", attrs...)
+			}
+			return nil
+		},
+	}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 

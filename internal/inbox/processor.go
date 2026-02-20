@@ -3,7 +3,7 @@ package inbox
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"log/slog"
 	"regexp"
 	"strconv"
 
@@ -46,7 +46,7 @@ func (p *Processor) ProcessNext() (bool, error) {
 		return false, fmt.Errorf("failed to claim inbox item: %w", err)
 	}
 
-	log.Printf("[processor] processing video %s: %s", item.YoutubeVideoID, item.VideoTitle)
+	slog.Info("processing video", "component", "processor", "video_id", item.YoutubeVideoID, "title", item.VideoTitle)
 
 	integration, err := p.integrationRepo.GetById(item.IntegrationID)
 	if err != nil {
@@ -59,7 +59,7 @@ func (p *Processor) ProcessNext() (bool, error) {
 	}
 
 	if !youtube.MatchesRelevancePattern(item.VideoTitle, relevanceRe) {
-		log.Printf("[processor] skipping video %s: not relevant", item.YoutubeVideoID)
+		slog.Debug("skipping video: not relevant", "component", "processor", "video_id", item.YoutubeVideoID)
 		return true, p.inboxRepo.MarkSkipped(item.ID, "not relevant")
 	}
 
@@ -92,7 +92,7 @@ func (p *Processor) ProcessNext() (bool, error) {
 		return true, p.fail(item, fmt.Sprintf("failed to check for duplicate: %v", err))
 	}
 	if exists {
-		log.Printf("[processor] skipping video %s: duplicate", item.YoutubeVideoID)
+		slog.Debug("skipping video: duplicate", "component", "processor", "video_id", item.YoutubeVideoID)
 		return true, p.inboxRepo.MarkSkipped(item.ID, "duplicate")
 	}
 
@@ -123,12 +123,12 @@ func (p *Processor) ProcessNext() (bool, error) {
 		return true, p.fail(item, fmt.Sprintf("failed to create highlight: %v", err))
 	}
 
-	log.Printf("[processor] created highlight for video %s → event %s", item.YoutubeVideoID, matchedEvent.Name)
+	slog.Info("created highlight", "component", "processor", "video_id", item.YoutubeVideoID, "event", matchedEvent.Name)
 	return true, p.inboxRepo.MarkCompleted(item.ID)
 }
 
 func (p *Processor) fail(item *InboxItem, reason string) error {
-	log.Printf("[processor] failed video %s: %s", item.YoutubeVideoID, reason)
+	slog.Warn("failed video", "component", "processor", "video_id", item.YoutubeVideoID, "reason", reason)
 	return p.inboxRepo.MarkFailed(item.ID, reason)
 }
 
