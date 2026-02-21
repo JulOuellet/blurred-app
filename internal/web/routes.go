@@ -8,6 +8,7 @@ import (
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
 	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
+	"github.com/JulOuellet/blurred-app/internal/domains/search"
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/internal/web/handlers/pages"
@@ -129,6 +130,11 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 
 	aboutPageHandler := pages.NewAboutPageHandler(sportService)
 	e.GET("/about", aboutPageHandler.GetAbout)
+
+	searchRepository := search.NewSearchRepository(db)
+	searchService := search.NewSearchService(searchRepository)
+	searchHandler := search.NewSearchHandler(searchService)
+	e.GET("/search", searchHandler.Search)
 
 	return e
 }

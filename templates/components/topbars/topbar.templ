@@ -1,12 +1,13 @@
 package topbars
 
 import "github.com/JulOuellet/blurred-app/templates/components/logos"
+import "github.com/JulOuellet/blurred-app/templates/components/searchbars"
 
 templ Topbar(title string) {
 	<header class="h-12 w-full flex items-center justify-between px-6 bg-neutral-100 shrink-0">
 		<div class="w-1/3 flex justify-start"></div>
 		<div class="w-1/3 flex justify-center">
-			<!-- @searchbars.Searchbar() -->
+			@searchbars.Searchbar()
 		</div>
 		<div class="w-1/3 flex justify-end items-center gap-4">
 			<a
