@@ -63,16 +63,6 @@ func (p *Processor) ProcessNext() (bool, error) {
 		return true, p.inboxRepo.MarkSkipped(item.ID, "not relevant")
 	}
 
-	eventRe, err := regexp.Compile(integration.EventPattern)
-	if err != nil {
-		return true, p.fail(item, fmt.Sprintf("invalid event pattern: %v", err))
-	}
-
-	eventNumber, ok := youtube.ExtractEventNumber(item.VideoTitle, eventRe)
-	if !ok {
-		return true, p.fail(item, "no event number found in title")
-	}
-
 	championshipEvents, err := p.eventRepo.GetAllByChampionshipId(
 		integration.ChampionshipID,
 		events.SortByDate,
@@ -82,9 +72,24 @@ func (p *Processor) ProcessNext() (bool, error) {
 		return true, p.fail(item, fmt.Sprintf("failed to get events: %v", err))
 	}
 
-	matchedEvent := matchEventByNumber(championshipEvents, eventNumber)
-	if matchedEvent == nil {
-		return true, p.fail(item, fmt.Sprintf("no event matching number %d", eventNumber))
+	var matchedEvent *events.EventModel
+	if len(championshipEvents) == 1 {
+		matchedEvent = &championshipEvents[0]
+	} else {
+		eventRe, err := regexp.Compile(integration.EventPattern)
+		if err != nil {
+			return true, p.fail(item, fmt.Sprintf("invalid event pattern: %v", err))
+		}
+
+		eventNumber, ok := youtube.ExtractEventNumber(item.VideoTitle, eventRe)
+		if !ok {
+			return true, p.fail(item, "no event number found in title")
+		}
+
+		matchedEvent = matchEventByNumber(championshipEvents, eventNumber)
+		if matchedEvent == nil {
+			return true, p.fail(item, fmt.Sprintf("no event matching number %d", eventNumber))
+		}
 	}
 
 	exists, err := p.highlightRepo.ExistsByYoutubeID(item.YoutubeVideoID)
@@ -102,7 +107,7 @@ func (p *Processor) ProcessNext() (bool, error) {
 	}
 
 	videoURL := fmt.Sprintf("https://www.youtube.com/watch?v=%s", item.YoutubeVideoID)
-	genericName := fmt.Sprintf("Stage %d Highlights", eventNumber)
+	genericName := fmt.Sprintf("%s Highlights", matchedEvent.Name)
 	source := ""
 	if integration.YoutubeChannelName != nil {
 		source = *integration.YoutubeChannelName
