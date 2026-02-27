@@ -3,6 +3,8 @@ package web
 import (
 	"context"
 	"log/slog"
+	"net/http"
+	"os"
 
 	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
@@ -135,6 +137,27 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	searchService := search.NewSearchService(searchRepository)
 	searchHandler := search.NewSearchHandler(searchService)
 	e.GET("/search", searchHandler.Search)
+
+	// Admin routes
+	adminHandler := pages.NewAdminPageHandler(integrationService, championshipService)
+	e.GET("/admin/login", adminHandler.GetLogin)
+	e.POST("/admin/login", adminHandler.PostLogin)
+	e.POST("/admin/logout", adminHandler.PostLogout)
+
+	adminGroup := e.Group("/admin")
+	adminGroup.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+		KeyLookup: "cookie:admin_token",
+		Validator: func(key string, c echo.Context) (bool, error) {
+			return key == os.Getenv("ADMIN_SESSION_SECRET"), nil
+		},
+		ErrorHandler: func(err error, c echo.Context) error {
+			return c.Redirect(http.StatusFound, "/admin/login")
+		},
+	}))
+	adminGroup.GET("/integrations", adminHandler.ListIntegrations)
+	adminGroup.GET("/integrations/new", adminHandler.NewIntegrationForm)
+	adminGroup.POST("/integrations", adminHandler.CreateIntegration)
+	adminGroup.POST("/integrations/:id/delete", adminHandler.DeleteIntegration)
 
 	return e
 }

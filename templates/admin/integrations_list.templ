@@ -1,0 +1,71 @@
+package admin
+
+import (
+	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
+	"github.com/JulOuellet/blurred-app/templates/layouts"
+)
+
+func channelName(i integrations.IntegrationModel) string {
+	if i.YoutubeChannelName != nil {
+		return *i.YoutubeChannelName
+	}
+	return i.YoutubeChannelID
+}
+
+templ IntegrationsListPage(items []integrations.IntegrationModel) {
+	@layouts.Admin("Integrations") {
+		<div class="flex items-center justify-between mb-6">
+			<h1 class="text-2xl font-bold">Integrations</h1>
+			<a
+				href="/admin/integrations/new"
+				class="px-4 py-2 bg-neutral-800 text-white text-sm font-medium rounded-lg hover:bg-neutral-700"
+			>
+				New integration
+			</a>
+		</div>
+		if len(items) == 0 {
+			<p class="text-neutral-500">No integrations yet.</p>
+		} else {
+			<div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+				<table class="w-full text-sm">
+					<thead class="bg-neutral-50 border-b border-neutral-200">
+						<tr>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Channel</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Lang</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Relevance Pattern</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Active</th>
+							<th class="text-right px-4 py-3 font-medium text-neutral-500">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-neutral-100">
+						for _, item := range items {
+							<tr class="hover:bg-neutral-50">
+								<td class="px-4 py-3 font-medium">{ channelName(item) }</td>
+								<td class="px-4 py-3 text-neutral-600">{ item.Lang }</td>
+								<td class="px-4 py-3 text-neutral-600 font-mono text-xs max-w-xs truncate">{ item.RelevancePattern }</td>
+								<td class="px-4 py-3">
+									if item.Active {
+										<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+									} else {
+										<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Inactive</span>
+									}
+								</td>
+								<td class="px-4 py-3 text-right space-x-2">
+									<a
+										href={ templ.SafeURL("/admin/integrations/" + item.ID.String() + "/edit") }
+										class="text-neutral-500 hover:text-neutral-800"
+									>
+										Edit
+									</a>
+									<form method="POST" action={ templ.SafeURL("/admin/integrations/" + item.ID.String() + "/delete") } class="inline" onsubmit="return confirm('Delete this integration?')">
+										<button type="submit" class="text-red-500 hover:text-red-700 cursor-pointer">Delete</button>
+									</form>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	}
+}

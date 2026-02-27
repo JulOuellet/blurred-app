@@ -14,6 +14,7 @@ type IntegrationService interface {
 	GetById(id uuid.UUID) (*IntegrationModel, error)
 	GetAllActive() ([]IntegrationModel, error)
 	Create(req IntegrationRequest) (*IntegrationModel, error)
+	Delete(id uuid.UUID) error
 }
 
 type integrationService struct {
@@ -80,4 +81,8 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 		relevancePattern,
 		eventPattern,
 	)
+}
+
+func (s *integrationService) Delete(id uuid.UUID) error {
+	return s.integrationRepo.Delete(id)
 }

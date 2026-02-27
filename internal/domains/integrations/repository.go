@@ -19,6 +19,7 @@ type IntegrationRepository interface {
 		relevancePattern string,
 		eventPattern string,
 	) (*IntegrationModel, error)
+	Delete(id uuid.UUID) error
 	UpdateLastPolledAt(id uuid.UUID, t time.Time) error
 }
 
@@ -156,6 +157,12 @@ func (r *integrationRepository) Create(
 		return nil, err
 	}
 	return &integration, nil
+}
+
+func (r *integrationRepository) Delete(id uuid.UUID) error {
+	query := `DELETE FROM integrations WHERE id = $1`
+	_, err := r.db.Exec(query, id)
+	return err
 }
 
 func (r *integrationRepository) UpdateLastPolledAt(id uuid.UUID, t time.Time) error {
