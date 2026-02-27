@@ -9,6 +9,7 @@ import (
 
 type IntegrationRepository interface {
 	GetAll() ([]IntegrationModel, error)
+	GetAllWithChampionship() ([]IntegrationWithChampionship, error)
 	GetById(id uuid.UUID) (*IntegrationModel, error)
 	GetAllActive() ([]IntegrationModel, error)
 	Create(
@@ -51,6 +52,32 @@ func (r *integrationRepository) GetAll() ([]IntegrationModel, error) {
 		  created_at DESC
 	`
 	var integrations []IntegrationModel
+	return integrations, r.db.Select(&integrations, query)
+}
+
+func (r *integrationRepository) GetAllWithChampionship() ([]IntegrationWithChampionship, error) {
+	query := `
+		SELECT
+		  i.id,
+		  i.youtube_channel_id,
+		  i.youtube_channel_name,
+		  i.championship_id,
+		  i.lang,
+		  i.relevance_pattern,
+		  i.event_pattern,
+		  i.active,
+		  i.last_polled_at,
+		  i.created_at,
+		  i.updated_at,
+		  c.name AS championship_name
+		FROM
+		  integrations i
+		JOIN
+		  championships c ON c.id = i.championship_id
+		ORDER BY
+		  c.name ASC, i.created_at DESC
+	`
+	var integrations []IntegrationWithChampionship
 	return integrations, r.db.Select(&integrations, query)
 }
 

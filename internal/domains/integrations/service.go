@@ -11,6 +11,7 @@ import (
 
 type IntegrationService interface {
 	GetAll() ([]IntegrationModel, error)
+	GetAllWithChampionship() ([]IntegrationWithChampionship, error)
 	GetById(id uuid.UUID) (*IntegrationModel, error)
 	GetAllActive() ([]IntegrationModel, error)
 	Create(req IntegrationRequest) (*IntegrationModel, error)
@@ -27,6 +28,10 @@ func NewIntegrationService(integrationRepo IntegrationRepository) IntegrationSer
 
 func (s *integrationService) GetAll() ([]IntegrationModel, error) {
 	return s.integrationRepo.GetAll()
+}
+
+func (s *integrationService) GetAllWithChampionship() ([]IntegrationWithChampionship, error) {
+	return s.integrationRepo.GetAllWithChampionship()
 }
 
 func (s *integrationService) GetById(id uuid.UUID) (*IntegrationModel, error) {

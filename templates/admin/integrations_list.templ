@@ -1,18 +1,29 @@
 package admin
 
 import (
+	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
 	"github.com/JulOuellet/blurred-app/templates/layouts"
 )
 
-func channelName(i integrations.IntegrationModel) string {
+type IntegrationsListData struct {
+	Items         []integrations.IntegrationWithChampionship
+	Championships []championships.ChampionshipModel
+	ActiveFilter  string
+}
+
+func channelName(i integrations.IntegrationWithChampionship) string {
 	if i.YoutubeChannelName != nil {
 		return *i.YoutubeChannelName
 	}
 	return i.YoutubeChannelID
 }
 
-templ IntegrationsListPage(items []integrations.IntegrationModel) {
+func isActiveFilter(data IntegrationsListData, id string) bool {
+	return data.ActiveFilter == id
+}
+
+templ IntegrationsListPage(data IntegrationsListData) {
 	@layouts.Admin("Integrations") {
 		<div class="flex items-center justify-between mb-6">
 			<h1 class="text-2xl font-bold">Integrations</h1>
@@ -23,13 +34,27 @@ templ IntegrationsListPage(items []integrations.IntegrationModel) {
 				New integration
 			</a>
 		</div>
-		if len(items) == 0 {
-			<p class="text-neutral-500">No integrations yet.</p>
+		<div class="mb-4">
+			<label for="championship-filter" class="text-sm font-medium text-neutral-600 mr-2">Championship:</label>
+			<select
+				id="championship-filter"
+				onchange="window.location.href = this.value ? '/admin/integrations?championship=' + this.value : '/admin/integrations'"
+				class="px-3 py-1.5 text-sm border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
+			>
+				<option value="">All</option>
+				for _, c := range data.Championships {
+					<option value={ c.ID.String() } selected?={ isActiveFilter(data, c.ID.String()) }>{ c.Name }</option>
+				}
+			</select>
+		</div>
+		if len(data.Items) == 0 {
+			<p class="text-neutral-500">No integrations found.</p>
 		} else {
 			<div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
 				<table class="w-full text-sm">
 					<thead class="bg-neutral-50 border-b border-neutral-200">
 						<tr>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Championship</th>
 							<th class="text-left px-4 py-3 font-medium text-neutral-500">Channel</th>
 							<th class="text-left px-4 py-3 font-medium text-neutral-500">Lang</th>
 							<th class="text-left px-4 py-3 font-medium text-neutral-500">Relevance Pattern</th>
@@ -38,8 +63,9 @@ templ IntegrationsListPage(items []integrations.IntegrationModel) {
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-neutral-100">
-						for _, item := range items {
+						for _, item := range data.Items {
 							<tr class="hover:bg-neutral-50">
+								<td class="px-4 py-3 text-neutral-600">{ item.ChampionshipName }</td>
 								<td class="px-4 py-3 font-medium">{ channelName(item) }</td>
 								<td class="px-4 py-3 text-neutral-600">{ item.Lang }</td>
 								<td class="px-4 py-3 text-neutral-600 font-mono text-xs max-w-xs truncate">{ item.RelevancePattern }</td>
@@ -50,13 +76,7 @@ templ IntegrationsListPage(items []integrations.IntegrationModel) {
 										<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Inactive</span>
 									}
 								</td>
-								<td class="px-4 py-3 text-right space-x-2">
-									<a
-										href={ templ.SafeURL("/admin/integrations/" + item.ID.String() + "/edit") }
-										class="text-neutral-500 hover:text-neutral-800"
-									>
-										Edit
-									</a>
+								<td class="px-4 py-3 text-right">
 									<form method="POST" action={ templ.SafeURL("/admin/integrations/" + item.ID.String() + "/delete") } class="inline" onsubmit="return confirm('Delete this integration?')">
 										<button type="submit" class="text-red-500 hover:text-red-700 cursor-pointer">Delete</button>
 									</form>

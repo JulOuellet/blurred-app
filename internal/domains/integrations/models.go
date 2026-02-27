@@ -20,6 +20,11 @@ type IntegrationModel struct {
 	UpdatedAt          time.Time  `json:"updatedAt" db:"updated_at"`
 }
 
+type IntegrationWithChampionship struct {
+	IntegrationModel
+	ChampionshipName string `db:"championship_name"`
+}
+
 type IntegrationRequest struct {
 	YoutubeChannelID   string    `json:"youtubeChannelId"`
 	YoutubeChannelName string    `json:"youtubeChannelName"`

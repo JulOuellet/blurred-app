@@ -64,15 +64,38 @@ func (h *AdminPageHandler) PostLogout(c echo.Context) error {
 }
 
 func (h *AdminPageHandler) ListIntegrations(c echo.Context) error {
-	items, err := h.integrationService.GetAll()
+	items, err := h.integrationService.GetAllWithChampionship()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load integrations")
 	}
 	if items == nil {
-		items = []integrations.IntegrationModel{}
+		items = []integrations.IntegrationWithChampionship{}
 	}
 
-	return admin.IntegrationsListPage(items).Render(c.Request().Context(), c.Response().Writer)
+	champs, err := h.championshipService.GetAll()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load championships")
+	}
+
+	filter := c.QueryParam("championship")
+	if filter != "" {
+		filterID, err := uuid.Parse(filter)
+		if err == nil {
+			filtered := []integrations.IntegrationWithChampionship{}
+			for _, item := range items {
+				if item.ChampionshipID == filterID {
+					filtered = append(filtered, item)
+				}
+			}
+			items = filtered
+		}
+	}
+
+	return admin.IntegrationsListPage(admin.IntegrationsListData{
+		Items:         items,
+		Championships: champs,
+		ActiveFilter:  filter,
+	}).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *AdminPageHandler) NewIntegrationForm(c echo.Context) error {
