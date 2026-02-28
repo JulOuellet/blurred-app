@@ -13,7 +13,7 @@ type IntegrationModel struct {
 	ChampionshipID     uuid.UUID  `json:"championshipId" db:"championship_id"`
 	Lang               string     `json:"lang" db:"lang"`
 	RelevancePattern   string     `json:"relevancePattern" db:"relevance_pattern"`
-	EventPattern       string     `json:"eventPattern" db:"event_pattern"`
+	EventPattern       *string    `json:"eventPattern" db:"event_pattern"`
 	Active             bool       `json:"active" db:"active"`
 	LastPolledAt       *time.Time `json:"lastPolledAt" db:"last_polled_at"`
 	CreatedAt          time.Time  `json:"createdAt" db:"created_at"`

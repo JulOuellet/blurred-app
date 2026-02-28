@@ -18,7 +18,7 @@ type IntegrationRepository interface {
 		championshipID uuid.UUID,
 		lang string,
 		relevancePattern string,
-		eventPattern string,
+		eventPattern *string,
 	) (*IntegrationModel, error)
 	Delete(id uuid.UUID) error
 	UpdateLastPolledAt(id uuid.UUID, t time.Time) error
@@ -142,7 +142,7 @@ func (r *integrationRepository) Create(
 	championshipID uuid.UUID,
 	lang string,
 	relevancePattern string,
-	eventPattern string,
+	eventPattern *string,
 ) (*IntegrationModel, error) {
 	query := `
 		INSERT INTO

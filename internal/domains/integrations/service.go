@@ -64,16 +64,17 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 		return nil, fmt.Errorf("invalid relevance pattern: %w", err)
 	}
 
-	eventPattern := strings.TrimSpace(req.EventPattern)
-	if eventPattern == "" {
-		return nil, fmt.Errorf("event pattern cannot be empty")
-	}
-	compiledEvent, err := regexp.Compile(eventPattern)
-	if err != nil {
-		return nil, fmt.Errorf("invalid event pattern: %w", err)
-	}
-	if compiledEvent.NumSubexp() < 1 {
-		return nil, fmt.Errorf("event pattern must contain at least one capture group for the event number")
+	var eventPattern *string
+	trimmedEventPattern := strings.TrimSpace(req.EventPattern)
+	if trimmedEventPattern != "" {
+		compiledEvent, err := regexp.Compile(trimmedEventPattern)
+		if err != nil {
+			return nil, fmt.Errorf("invalid event pattern: %w", err)
+		}
+		if compiledEvent.NumSubexp() < 1 {
+			return nil, fmt.Errorf("event pattern must contain at least one capture group for the event number")
+		}
+		eventPattern = &trimmedEventPattern
 	}
 
 	youtubeChannelName := strings.TrimSpace(req.YoutubeChannelName)

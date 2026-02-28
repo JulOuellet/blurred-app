@@ -75,8 +75,10 @@ func (p *Processor) ProcessNext() (bool, error) {
 	var matchedEvent *events.EventModel
 	if len(championshipEvents) == 1 {
 		matchedEvent = &championshipEvents[0]
+	} else if integration.EventPattern == nil {
+		return true, p.fail(item, "event pattern is required for championships with multiple events")
 	} else {
-		eventRe, err := regexp.Compile(integration.EventPattern)
+		eventRe, err := regexp.Compile(*integration.EventPattern)
 		if err != nil {
 			return true, p.fail(item, fmt.Sprintf("invalid event pattern: %v", err))
 		}
