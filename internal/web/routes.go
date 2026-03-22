@@ -139,7 +139,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	e.GET("/search", searchHandler.Search)
 
 	// Admin routes
-	adminHandler := pages.NewAdminPageHandler(integrationService, championshipService)
+	adminHandler := pages.NewAdminPageHandler(integrationService, sportService)
 	e.GET("/admin/login", adminHandler.GetLogin)
 	e.POST("/admin/login", adminHandler.PostLogin)
 	e.POST("/admin/logout", adminHandler.PostLogout)

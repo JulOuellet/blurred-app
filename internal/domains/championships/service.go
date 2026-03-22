@@ -3,6 +3,7 @@ package championships
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -14,6 +15,7 @@ type ChampionshipService interface {
 	GetAllBySeasonId(seasonId uuid.UUID) ([]ChampionshipModel, error)
 	GetOngoing() ([]HomeChampionship, error)
 	GetUpcoming(limit int) ([]HomeChampionship, error)
+	GetCandidatesForMatching(sportID uuid.UUID, publishedAt time.Time) ([]ChampionshipModel, error)
 }
 
 type championshipService struct {
@@ -42,6 +44,10 @@ func (s *championshipService) GetOngoing() ([]HomeChampionship, error) {
 
 func (s *championshipService) GetUpcoming(limit int) ([]HomeChampionship, error) {
 	return s.championshipRepo.GetUpcoming(limit)
+}
+
+func (s *championshipService) GetCandidatesForMatching(sportID uuid.UUID, publishedAt time.Time) ([]ChampionshipModel, error) {
+	return s.championshipRepo.GetCandidatesForMatching(sportID, publishedAt)
 }
 
 func (s *championshipService) Create(req ChampionshipRequest) (*ChampionshipModel, error) {

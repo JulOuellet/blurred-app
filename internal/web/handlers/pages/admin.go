@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
+	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/templates/admin"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -13,17 +13,17 @@ import (
 )
 
 type AdminPageHandler struct {
-	integrationService  integrations.IntegrationService
-	championshipService championships.ChampionshipService
+	integrationService integrations.IntegrationService
+	sportService       sports.SportService
 }
 
 func NewAdminPageHandler(
 	integrationService integrations.IntegrationService,
-	championshipService championships.ChampionshipService,
+	sportService sports.SportService,
 ) AdminPageHandler {
 	return AdminPageHandler{
-		integrationService:  integrationService,
-		championshipService: championshipService,
+		integrationService: integrationService,
+		sportService:       sportService,
 	}
 }
 
@@ -64,26 +64,26 @@ func (h *AdminPageHandler) PostLogout(c echo.Context) error {
 }
 
 func (h *AdminPageHandler) ListIntegrations(c echo.Context) error {
-	items, err := h.integrationService.GetAllWithChampionship()
+	items, err := h.integrationService.GetAllWithSport()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load integrations")
 	}
 	if items == nil {
-		items = []integrations.IntegrationWithChampionship{}
+		items = []integrations.IntegrationWithSport{}
 	}
 
-	champs, err := h.championshipService.GetAll()
+	allSports, err := h.sportService.GetAll()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load championships")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load sports")
 	}
 
-	filter := c.QueryParam("championship")
+	filter := c.QueryParam("sport")
 	if filter != "" {
 		filterID, err := uuid.Parse(filter)
 		if err == nil {
-			filtered := []integrations.IntegrationWithChampionship{}
+			filtered := []integrations.IntegrationWithSport{}
 			for _, item := range items {
-				if item.ChampionshipID == filterID {
+				if item.SportID == filterID {
 					filtered = append(filtered, item)
 				}
 			}
@@ -92,36 +92,37 @@ func (h *AdminPageHandler) ListIntegrations(c echo.Context) error {
 	}
 
 	return admin.IntegrationsListPage(admin.IntegrationsListData{
-		Items:         items,
-		Championships: champs,
-		ActiveFilter:  filter,
+		Items:        items,
+		Sports:       allSports,
+		ActiveFilter: filter,
 	}).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *AdminPageHandler) NewIntegrationForm(c echo.Context) error {
-	champs, err := h.championshipService.GetAll()
+	allSports, err := h.sportService.GetAll()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load championships")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load sports")
 	}
 
 	return admin.IntegrationFormPage(admin.IntegrationFormData{
-		Championships: champs,
+		Sports: allSports,
 	}).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *AdminPageHandler) CreateIntegration(c echo.Context) error {
-	championshipID, err := uuid.Parse(c.FormValue("championshipId"))
+	sportID, err := uuid.Parse(c.FormValue("sportId"))
 	if err != nil {
-		return h.renderFormWithError(c, "Invalid championship ID")
+		return h.renderFormWithError(c, "Invalid sport ID")
 	}
 
 	req := integrations.IntegrationRequest{
 		YoutubeChannelID:   c.FormValue("youtubeChannelId"),
 		YoutubeChannelName: c.FormValue("youtubeChannelName"),
-		ChampionshipID:     championshipID,
+		SportID:            sportID,
 		Lang:               c.FormValue("lang"),
-		RelevancePattern:   c.FormValue("relevancePattern"),
-		EventPattern:       c.FormValue("eventPattern"),
+		ContentFilter:      c.FormValue("contentFilter"),
+		TitleExclude:       c.FormValue("titleExclude"),
+		StagePattern:       c.FormValue("stagePattern"),
 	}
 
 	_, err = h.integrationService.Create(req)
@@ -146,13 +147,13 @@ func (h *AdminPageHandler) DeleteIntegration(c echo.Context) error {
 }
 
 func (h *AdminPageHandler) renderFormWithError(c echo.Context, errorMsg string) error {
-	champs, err := h.championshipService.GetAll()
+	allSports, err := h.sportService.GetAll()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load championships")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load sports")
 	}
 
 	return admin.IntegrationFormPage(admin.IntegrationFormData{
-		Championships: champs,
-		ErrorMsg:      errorMsg,
+		Sports:   allSports,
+		ErrorMsg: errorMsg,
 	}).Render(c.Request().Context(), c.Response().Writer)
 }

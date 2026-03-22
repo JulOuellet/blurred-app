@@ -9,16 +9,17 @@ import (
 
 type IntegrationRepository interface {
 	GetAll() ([]IntegrationModel, error)
-	GetAllWithChampionship() ([]IntegrationWithChampionship, error)
+	GetAllWithSport() ([]IntegrationWithSport, error)
 	GetById(id uuid.UUID) (*IntegrationModel, error)
 	GetAllActive() ([]IntegrationModel, error)
 	Create(
 		youtubeChannelID string,
 		youtubeChannelName string,
-		championshipID uuid.UUID,
+		sportID uuid.UUID,
 		lang string,
-		relevancePattern string,
-		eventPattern *string,
+		contentFilter *string,
+		titleExclude *string,
+		stagePattern *string,
 	) (*IntegrationModel, error)
 	Delete(id uuid.UUID) error
 	UpdateLastPolledAt(id uuid.UUID, t time.Time) error
@@ -38,10 +39,11 @@ func (r *integrationRepository) GetAll() ([]IntegrationModel, error) {
 		  id,
 		  youtube_channel_id,
 		  youtube_channel_name,
-		  championship_id,
+		  sport_id,
 		  lang,
-		  relevance_pattern,
-		  event_pattern,
+		  content_filter,
+		  title_exclude,
+		  stage_pattern,
 		  active,
 		  last_polled_at,
 		  created_at,
@@ -55,29 +57,29 @@ func (r *integrationRepository) GetAll() ([]IntegrationModel, error) {
 	return integrations, r.db.Select(&integrations, query)
 }
 
-func (r *integrationRepository) GetAllWithChampionship() ([]IntegrationWithChampionship, error) {
+func (r *integrationRepository) GetAllWithSport() ([]IntegrationWithSport, error) {
 	query := `
 		SELECT
 		  i.id,
 		  i.youtube_channel_id,
 		  i.youtube_channel_name,
-		  i.championship_id,
+		  i.sport_id,
 		  i.lang,
-		  i.relevance_pattern,
-		  i.event_pattern,
+		  i.content_filter,
+		  i.stage_pattern,
 		  i.active,
 		  i.last_polled_at,
 		  i.created_at,
 		  i.updated_at,
-		  c.name AS championship_name
+		  s.name AS sport_name
 		FROM
 		  integrations i
 		JOIN
-		  championships c ON c.id = i.championship_id
+		  sports s ON s.id = i.sport_id
 		ORDER BY
-		  c.name ASC, i.created_at DESC
+		  s.name ASC, i.created_at DESC
 	`
-	var integrations []IntegrationWithChampionship
+	var integrations []IntegrationWithSport
 	return integrations, r.db.Select(&integrations, query)
 }
 
@@ -87,10 +89,11 @@ func (r *integrationRepository) GetById(id uuid.UUID) (*IntegrationModel, error)
 		  id,
 		  youtube_channel_id,
 		  youtube_channel_name,
-		  championship_id,
+		  sport_id,
 		  lang,
-		  relevance_pattern,
-		  event_pattern,
+		  content_filter,
+		  title_exclude,
+		  stage_pattern,
 		  active,
 		  last_polled_at,
 		  created_at,
@@ -111,26 +114,24 @@ func (r *integrationRepository) GetById(id uuid.UUID) (*IntegrationModel, error)
 func (r *integrationRepository) GetAllActive() ([]IntegrationModel, error) {
 	query := `
 		SELECT
-		  i.id,
-		  i.youtube_channel_id,
-		  i.youtube_channel_name,
-		  i.championship_id,
-		  i.lang,
-		  i.relevance_pattern,
-		  i.event_pattern,
-		  i.active,
-		  i.last_polled_at,
-		  i.created_at,
-		  i.updated_at
+		  id,
+		  youtube_channel_id,
+		  youtube_channel_name,
+		  sport_id,
+		  lang,
+		  content_filter,
+		  title_exclude,
+		  stage_pattern,
+		  active,
+		  last_polled_at,
+		  created_at,
+		  updated_at
 		FROM
-		  integrations i
-		JOIN
-		  championships c ON c.id = i.championship_id
+		  integrations
 		WHERE
-		  i.active = true
-		  AND (c.end_date IS NULL OR c.end_date > NOW())
+		  active = true
 		ORDER BY
-		  i.created_at ASC
+		  created_at ASC
 	`
 	var integrations []IntegrationModel
 	return integrations, r.db.Select(&integrations, query)
@@ -139,31 +140,34 @@ func (r *integrationRepository) GetAllActive() ([]IntegrationModel, error) {
 func (r *integrationRepository) Create(
 	youtubeChannelID string,
 	youtubeChannelName string,
-	championshipID uuid.UUID,
+	sportID uuid.UUID,
 	lang string,
-	relevancePattern string,
-	eventPattern *string,
+	contentFilter *string,
+	titleExclude *string,
+	stagePattern *string,
 ) (*IntegrationModel, error) {
 	query := `
 		INSERT INTO
 		  integrations (
 			youtube_channel_id,
 			youtube_channel_name,
-			championship_id,
+			sport_id,
 			lang,
-			relevance_pattern,
-			event_pattern
+			content_filter,
+			title_exclude,
+			stage_pattern
 		  )
 		VALUES
-		  ($1, $2, $3, $4, $5, $6)
+		  ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING
 		  id,
 		  youtube_channel_id,
 		  youtube_channel_name,
-		  championship_id,
+		  sport_id,
 		  lang,
-		  relevance_pattern,
-		  event_pattern,
+		  content_filter,
+		  title_exclude,
+		  stage_pattern,
 		  active,
 		  last_polled_at,
 		  created_at,
@@ -175,10 +179,11 @@ func (r *integrationRepository) Create(
 		query,
 		youtubeChannelID,
 		youtubeChannelName,
-		championshipID,
+		sportID,
 		lang,
-		relevancePattern,
-		eventPattern,
+		contentFilter,
+		titleExclude,
+		stagePattern,
 	)
 	if err != nil {
 		return nil, err

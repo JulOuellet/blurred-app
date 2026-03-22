@@ -11,7 +11,7 @@ import (
 
 type IntegrationService interface {
 	GetAll() ([]IntegrationModel, error)
-	GetAllWithChampionship() ([]IntegrationWithChampionship, error)
+	GetAllWithSport() ([]IntegrationWithSport, error)
 	GetById(id uuid.UUID) (*IntegrationModel, error)
 	GetAllActive() ([]IntegrationModel, error)
 	Create(req IntegrationRequest) (*IntegrationModel, error)
@@ -30,8 +30,8 @@ func (s *integrationService) GetAll() ([]IntegrationModel, error) {
 	return s.integrationRepo.GetAll()
 }
 
-func (s *integrationService) GetAllWithChampionship() ([]IntegrationWithChampionship, error) {
-	return s.integrationRepo.GetAllWithChampionship()
+func (s *integrationService) GetAllWithSport() ([]IntegrationWithSport, error) {
+	return s.integrationRepo.GetAllWithSport()
 }
 
 func (s *integrationService) GetById(id uuid.UUID) (*IntegrationModel, error) {
@@ -48,6 +48,10 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 		return nil, fmt.Errorf("youtube channel ID cannot be empty")
 	}
 
+	if req.SportID == uuid.Nil {
+		return nil, fmt.Errorf("sport ID cannot be empty")
+	}
+
 	lang := strings.TrimSpace(req.Lang)
 	if lang == "" {
 		return nil, fmt.Errorf("language cannot be empty")
@@ -56,25 +60,35 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 		return nil, fmt.Errorf("invalid language %q: must be a valid language code (e.g. en-GB, fr-FR)", lang)
 	}
 
-	relevancePattern := strings.TrimSpace(req.RelevancePattern)
-	if relevancePattern == "" {
-		return nil, fmt.Errorf("relevance pattern cannot be empty")
-	}
-	if _, err := regexp.Compile(relevancePattern); err != nil {
-		return nil, fmt.Errorf("invalid relevance pattern: %w", err)
+	var contentFilter *string
+	trimmedContentFilter := strings.TrimSpace(req.ContentFilter)
+	if trimmedContentFilter != "" {
+		if _, err := regexp.Compile(trimmedContentFilter); err != nil {
+			return nil, fmt.Errorf("invalid content filter: %w", err)
+		}
+		contentFilter = &trimmedContentFilter
 	}
 
-	var eventPattern *string
-	trimmedEventPattern := strings.TrimSpace(req.EventPattern)
-	if trimmedEventPattern != "" {
-		compiledEvent, err := regexp.Compile(trimmedEventPattern)
+	var titleExclude *string
+	trimmedTitleExclude := strings.TrimSpace(req.TitleExclude)
+	if trimmedTitleExclude != "" {
+		if _, err := regexp.Compile(trimmedTitleExclude); err != nil {
+			return nil, fmt.Errorf("invalid title exclude pattern: %w", err)
+		}
+		titleExclude = &trimmedTitleExclude
+	}
+
+	var stagePattern *string
+	trimmedStagePattern := strings.TrimSpace(req.StagePattern)
+	if trimmedStagePattern != "" {
+		compiled, err := regexp.Compile(trimmedStagePattern)
 		if err != nil {
-			return nil, fmt.Errorf("invalid event pattern: %w", err)
+			return nil, fmt.Errorf("invalid stage pattern: %w", err)
 		}
-		if compiledEvent.NumSubexp() < 1 {
-			return nil, fmt.Errorf("event pattern must contain at least one capture group for the event number")
+		if compiled.NumSubexp() < 1 {
+			return nil, fmt.Errorf("stage pattern must contain at least one capture group for the stage number")
 		}
-		eventPattern = &trimmedEventPattern
+		stagePattern = &trimmedStagePattern
 	}
 
 	youtubeChannelName := strings.TrimSpace(req.YoutubeChannelName)
@@ -82,10 +96,11 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 	return s.integrationRepo.Create(
 		youtubeChannelID,
 		youtubeChannelName,
-		req.ChampionshipID,
+		req.SportID,
 		lang,
-		relevancePattern,
-		eventPattern,
+		contentFilter,
+		titleExclude,
+		stagePattern,
 	)
 }
 

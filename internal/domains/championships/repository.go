@@ -22,6 +22,7 @@ type ChampionshipRepository interface {
 	GetAllBySeasonId(seasonId uuid.UUID) ([]ChampionshipModel, error)
 	GetOngoing() ([]HomeChampionship, error)
 	GetUpcoming(limit int) ([]HomeChampionship, error)
+	GetCandidatesForMatching(sportID uuid.UUID, publishedAt time.Time) ([]ChampionshipModel, error)
 }
 
 type championshipRepository struct {
@@ -43,11 +44,12 @@ func (r *championshipRepository) GetAll() ([]ChampionshipModel, error) {
 		  season_id, 
 		  description,
 		  reference_img_url,
-		  created_at, 
+		  title_pattern,
+		  created_at,
 		  updated_at
-		FROM 
+		FROM
 		  championships
-		ORDER BY 
+		ORDER BY
 		  created_at DESC
 	`
 
@@ -57,18 +59,19 @@ func (r *championshipRepository) GetAll() ([]ChampionshipModel, error) {
 
 func (r *championshipRepository) GetById(id uuid.UUID) (*ChampionshipModel, error) {
 	query := `
-		SELECT 
-		  id, 
-		  name, 
-		  organization, 
-		  start_date, 
-		  end_date, 
-		  season_id, 
+		SELECT
+		  id,
+		  name,
+		  organization,
+		  start_date,
+		  end_date,
+		  season_id,
 		  description,
 		  reference_img_url,
-		  created_at, 
+		  title_pattern,
+		  created_at,
 		  updated_at
-		FROM 
+		FROM
 		  championships
 		WHERE
 		  id = $1
@@ -114,6 +117,7 @@ func (r *championshipRepository) Create(
 		  season_id,
 		  description,
 		  reference_img_url,
+		  title_pattern,
 		  created_at,
 		  updated_at
 	`
@@ -148,6 +152,7 @@ func (r *championshipRepository) GetAllBySeasonId(seasonId uuid.UUID) ([]Champio
 		  season_id,
 		  description,
 		  reference_img_url,
+		  title_pattern,
 		  created_at,
 		  updated_at
 		FROM
@@ -174,6 +179,7 @@ func (r *championshipRepository) GetOngoing() ([]HomeChampionship, error) {
 		  c.season_id,
 		  c.description,
 		  c.reference_img_url,
+		  c.title_pattern,
 		  c.created_at,
 		  c.updated_at,
 		  sp.name AS sport_name
@@ -199,6 +205,7 @@ func (r *championshipRepository) GetUpcoming(limit int) ([]HomeChampionship, err
 		  c.season_id,
 		  c.description,
 		  c.reference_img_url,
+		  c.title_pattern,
 		  c.created_at,
 		  c.updated_at,
 		  sp.name AS sport_name
@@ -212,4 +219,31 @@ func (r *championshipRepository) GetUpcoming(limit int) ([]HomeChampionship, err
 
 	var championships []HomeChampionship
 	return championships, r.db.Select(&championships, query, limit)
+}
+
+func (r *championshipRepository) GetCandidatesForMatching(sportID uuid.UUID, publishedAt time.Time) ([]ChampionshipModel, error) {
+	query := `
+		SELECT
+		  c.id,
+		  c.name,
+		  c.organization,
+		  c.start_date,
+		  c.end_date,
+		  c.season_id,
+		  c.description,
+		  c.reference_img_url,
+		  c.title_pattern,
+		  c.created_at,
+		  c.updated_at
+		FROM championships c
+		JOIN seasons s ON c.season_id = s.id
+		WHERE s.sport_id = $1
+		  AND c.title_pattern IS NOT NULL
+		  AND c.start_date <= $2::timestamptz + INTERVAL '1 day'
+		  AND c.end_date >= $2::timestamptz - INTERVAL '1 day'
+		ORDER BY c.start_date ASC
+	`
+
+	var championships []ChampionshipModel
+	return championships, r.db.Select(&championships, query, sportID, publishedAt)
 }

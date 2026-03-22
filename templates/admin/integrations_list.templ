@@ -1,22 +1,29 @@
 package admin
 
 import (
-	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
+	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/templates/layouts"
 )
 
 type IntegrationsListData struct {
-	Items         []integrations.IntegrationWithChampionship
-	Championships []championships.ChampionshipModel
-	ActiveFilter  string
+	Items        []integrations.IntegrationWithSport
+	Sports       []sports.SportModel
+	ActiveFilter string
 }
 
-func channelName(i integrations.IntegrationWithChampionship) string {
+func channelName(i integrations.IntegrationWithSport) string {
 	if i.YoutubeChannelName != nil {
 		return *i.YoutubeChannelName
 	}
 	return i.YoutubeChannelID
+}
+
+func contentFilterDisplay(i integrations.IntegrationWithSport) string {
+	if i.ContentFilter != nil {
+		return *i.ContentFilter
+	}
+	return "-"
 }
 
 func isActiveFilter(data IntegrationsListData, id string) bool {
@@ -35,15 +42,15 @@ templ IntegrationsListPage(data IntegrationsListData) {
 			</a>
 		</div>
 		<div class="mb-4">
-			<label for="championship-filter" class="text-sm font-medium text-neutral-600 mr-2">Championship:</label>
+			<label for="sport-filter" class="text-sm font-medium text-neutral-600 mr-2">Sport:</label>
 			<select
-				id="championship-filter"
-				onchange="window.location.href = this.value ? '/admin/integrations?championship=' + this.value : '/admin/integrations'"
+				id="sport-filter"
+				onchange="window.location.href = this.value ? '/admin/integrations?sport=' + this.value : '/admin/integrations'"
 				class="px-3 py-1.5 text-sm border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
 			>
 				<option value="">All</option>
-				for _, c := range data.Championships {
-					<option value={ c.ID.String() } selected?={ isActiveFilter(data, c.ID.String()) }>{ c.Name }</option>
+				for _, s := range data.Sports {
+					<option value={ s.ID.String() } selected?={ isActiveFilter(data, s.ID.String()) }>{ s.Name }</option>
 				}
 			</select>
 		</div>
@@ -54,10 +61,10 @@ templ IntegrationsListPage(data IntegrationsListData) {
 				<table class="w-full text-sm">
 					<thead class="bg-neutral-50 border-b border-neutral-200">
 						<tr>
-							<th class="text-left px-4 py-3 font-medium text-neutral-500">Championship</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Sport</th>
 							<th class="text-left px-4 py-3 font-medium text-neutral-500">Channel</th>
 							<th class="text-left px-4 py-3 font-medium text-neutral-500">Lang</th>
-							<th class="text-left px-4 py-3 font-medium text-neutral-500">Relevance Pattern</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Content Filter</th>
 							<th class="text-left px-4 py-3 font-medium text-neutral-500">Active</th>
 							<th class="text-right px-4 py-3 font-medium text-neutral-500">Actions</th>
 						</tr>
@@ -65,10 +72,10 @@ templ IntegrationsListPage(data IntegrationsListData) {
 					<tbody class="divide-y divide-neutral-100">
 						for _, item := range data.Items {
 							<tr class="hover:bg-neutral-50">
-								<td class="px-4 py-3 text-neutral-600">{ item.ChampionshipName }</td>
+								<td class="px-4 py-3 text-neutral-600">{ item.SportName }</td>
 								<td class="px-4 py-3 font-medium">{ channelName(item) }</td>
 								<td class="px-4 py-3 text-neutral-600">{ item.Lang }</td>
-								<td class="px-4 py-3 text-neutral-600 font-mono text-xs max-w-xs truncate">{ item.RelevancePattern }</td>
+								<td class="px-4 py-3 text-neutral-600 font-mono text-xs max-w-xs truncate">{ contentFilterDisplay(item) }</td>
 								<td class="px-4 py-3">
 									if item.Active {
 										<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>

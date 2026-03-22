@@ -15,6 +15,7 @@ type ChampionshipModel struct {
 	SeasonID        uuid.UUID  `json:"seasonId" db:"season_id"`
 	Description     *string    `json:"description" db:"description"`
 	ReferenceImgURL string     `json:"referenceImgUrl" db:"reference_img_url"`
+	TitlePattern    *string    `json:"titlePattern" db:"title_pattern"`
 	CreatedAt       time.Time  `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time  `json:"updatedAt" db:"updated_at"`
 }

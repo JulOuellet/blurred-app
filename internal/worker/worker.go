@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
 	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
@@ -28,6 +29,7 @@ type Worker struct {
 func New(db *sqlx.DB, youtubeAPIKey string) *Worker {
 	integrationRepo := integrations.NewIntegrationRepository(db)
 	inboxRepo := inbox.NewInboxRepository(db)
+	championshipRepo := championships.NewChampionshipRepository(db)
 	eventRepo := events.NewEventRepository(db)
 	highlightRepo := highlights.NewHighlightRepository(db)
 	youtubeClient := youtube.NewClient(youtubeAPIKey)
@@ -35,6 +37,7 @@ func New(db *sqlx.DB, youtubeAPIKey string) *Worker {
 	processor := inbox.NewProcessor(
 		inboxRepo,
 		integrationRepo,
+		championshipRepo,
 		eventRepo,
 		highlightRepo,
 		youtubeClient,
