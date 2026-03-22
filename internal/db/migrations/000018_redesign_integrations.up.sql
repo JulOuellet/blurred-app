@@ -2,11 +2,10 @@
 -- Redesign integrations: channel+championship → channel+sport
 -- ============================================================
 
--- 1. Delete seeded integrations (cascades to youtube_inbox)
-DELETE FROM integrations WHERE id IN (
-    '30000000-2026-4000-a000-000000000001',
-    '30000000-2026-4000-a000-000000000002'
-);
+-- 1. Delete all existing integrations (cascades to youtube_inbox)
+-- The old schema is channel+championship; the new schema is channel+sport.
+-- All integrations must be recreated with the new schema.
+DELETE FROM integrations;
 
 -- 2. Alter integrations table
 DROP INDEX IF EXISTS idx_integrations_championship_id;
