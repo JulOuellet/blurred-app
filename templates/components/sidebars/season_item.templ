@@ -9,9 +9,9 @@ templ SeasonItem(season seasons.SeasonModel, isActive bool) {
 		hx-target="#main-content"
 		hx-swap="innerHTML"
 		hx-push-url="true"
-		class={ "block rounded-lg px-4 py-2 text-sm font-medium hover:bg-neutral-200 hover:text-neutral-800",
-			templ.KV("bg-neutral-200 text-neutral-800", isActive),
-			templ.KV("text-neutral-600", !isActive) }
+		class={ "block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-neutral-200/70 hover:text-neutral-800",
+			templ.KV("bg-neutral-200/70 text-neutral-800", isActive),
+			templ.KV("text-neutral-500", !isActive) }
 	>
 		{ season.Name }
 	</a>

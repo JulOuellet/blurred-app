@@ -4,31 +4,39 @@ import "github.com/JulOuellet/blurred-app/templates/components/logos"
 import "github.com/JulOuellet/blurred-app/templates/components/searchbars"
 
 templ Topbar(title string) {
-	<header class="h-12 w-full flex items-center justify-between px-6 bg-neutral-100 shrink-0">
-		<div class="w-1/3 flex justify-start"></div>
-		<div class="w-1/3 flex justify-center">
+	<header class="h-12 w-full flex items-center justify-between px-4 bg-neutral-100 shrink-0">
+		<div class="flex items-center gap-3">
+			<button
+				@click="sidebarOpen = !sidebarOpen"
+				class="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200 transition-colors"
+				title="Toggle sidebar"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+				</svg>
+			</button>
+		</div>
+		<div class="flex-1 flex justify-center max-w-xs mx-auto">
 			@searchbars.Searchbar()
 		</div>
-		<div class="w-1/3 flex justify-end items-center gap-4">
+		<div class="flex items-center gap-3">
 			<a
 				href="/about"
 				hx-get="/about"
 				hx-target="#main-content"
 				hx-swap="innerHTML"
 				hx-push-url="true"
-				class="text-sm font-medium text-neutral-600 hover:text-neutral-800 transition-colors"
+				class="text-sm font-medium text-neutral-500 hover:text-neutral-800 transition-colors"
 			>
 				About
 			</a>
 			<a
 				href="https://github.com/JulOuellet/blurred-app"
 				target="_blank"
-				class="text-neutral-600 hover:text-primary transition-colors"
+				class="text-neutral-500 hover:text-neutral-800 transition-colors"
 				title="View on GitHub"
 			>
-				<div class="cursor-pointer text-neutral-800 hover:text-neutral-600">
-					@logos.GithubLogo()
-				</div>
+				@logos.GithubLogo()
 			</a>
 		</div>
 	</header>

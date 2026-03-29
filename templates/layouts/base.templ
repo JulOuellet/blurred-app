@@ -17,14 +17,16 @@ templ Base(title string, sportsList []sports.SportWithSeasons, activeID string) 
 			<link href="/assets/css/output.css" rel="stylesheet"/>
 			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
 			<script src="https://unpkg.com/htmx.org/dist/ext/head-support.js"></script>
+			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 		</head>
-		<body hx-ext="head-support" class="h-full flex overflow-hidden antialiased font-sans text-neutral-800 bg-neutral-100">
+		<body hx-ext="head-support" x-data="{ sidebarOpen: true }" class="h-full flex overflow-hidden antialiased font-sans text-neutral-800 bg-neutral-100">
 			@sidebars.Sidebar(sportsList, activeID, false)
-			<div class="flex-1 flex flex-col min-w-0 h-full">
+			<div class="flex-1 flex flex-col min-w-0 h-full transition-all duration-300">
 				@topbars.Topbar(title)
 				<main
 					id="main-content"
-					class="flex-1 w-full bg-neutral-200 text-neutral-800 rounded-tl-2xl overflow-y-auto relative"
+					class="flex-1 w-full bg-neutral-200 text-neutral-800 overflow-y-auto relative"
+					:class="sidebarOpen ? 'rounded-tl-xl' : ''"
 				>
 					<div class="min-h-full">
 						{ children... }

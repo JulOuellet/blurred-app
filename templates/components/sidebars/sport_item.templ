@@ -14,13 +14,13 @@ templ SportItem(name string, seasons []seasons.SeasonModel, activeID string) {
 	}}
 	<details class="group [&_summary::-webkit-details-marker]:hidden" open?={ isOpen }>
 		<summary
-			class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-800"
+			class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-neutral-500 hover:bg-neutral-200/70 hover:text-neutral-800 transition-colors"
 		>
 			<span class="text-sm font-medium">{ name }</span>
 			<span class="shrink-0 transition duration-300 group-open:-rotate-180">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					class="size-5"
+					class="size-4"
 					viewBox="0 0 20 20"
 					fill="currentColor"
 				>
@@ -32,7 +32,7 @@ templ SportItem(name string, seasons []seasons.SeasonModel, activeID string) {
 				</svg>
 			</span>
 		</summary>
-		<ul class="mt-2 space-y-1 px-4 list-none">
+		<ul class="mt-1 space-y-0.5 px-3 list-none">
 			@SeasonsList(seasons, activeID)
 		</ul>
 	</details>

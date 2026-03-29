@@ -6,12 +6,13 @@ import "github.com/JulOuellet/blurred-app/templates/components/logos"
 templ Sidebar(sportsList []sports.SportWithSeasons, activeID string, isOOB bool) {
 	<aside
 		id="sidebar"
-		class="w-64 flex flex-col shrink-0 bg-neutral-100"
+		:class="sidebarOpen ? 'w-60' : 'w-0'"
+		class="flex flex-col shrink-0 bg-neutral-100 overflow-hidden transition-[width] duration-200 linear"
 		if isOOB {
 			hx-swap-oob="true"
 		}
 	>
-		<div class="px-6 py-4 flex items-center h-16">
+		<div class="px-5 flex items-center h-12">
 			<a
 				href="/"
 				hx-get="/"
@@ -20,10 +21,11 @@ templ Sidebar(sportsList []sports.SportWithSeasons, activeID string, isOOB bool)
 				hx-push-url="true"
 				class="cursor-pointer text-neutral-800 hover:text-neutral-600 transition-colors"
 			>
-				@logos.BlurredLogo("h-10 w-auto")
+				@logos.BlurredLogo("h-8 w-auto")
 			</a>
 		</div>
-		<div class="flex-1 overflow-y-auto px-4 py-4">
+		<div class="flex-1 overflow-y-auto px-3 py-3">
+			<p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Sports</p>
 			<div id="sports-list" class="text-neutral-600">
 				<ul class="list-none">
 					@SportsList(sportsList, activeID)
