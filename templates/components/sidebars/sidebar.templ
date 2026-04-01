@@ -6,8 +6,8 @@ import "github.com/JulOuellet/blurred-app/templates/components/logos"
 templ Sidebar(sportsList []sports.SportWithSeasons, activeID string, isOOB bool) {
 	<aside
 		id="sidebar"
-		:class="sidebarOpen ? 'w-60' : 'w-0'"
-		class="flex flex-col shrink-0 bg-neutral-100 overflow-hidden transition-[width] duration-200 linear"
+		:class="!sidebarOpen && 'w-0!'"
+		class="w-60 flex flex-col shrink-0 bg-neutral-100 overflow-hidden transition-[width] duration-200 linear"
 		if isOOB {
 			hx-swap-oob="true"
 		}
