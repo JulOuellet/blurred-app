@@ -1,0 +1,24 @@
+version: "0.5"
+
+processes:
+  db:
+    command: docker-compose up
+    shutdown:
+      command: docker-compose down
+    readiness_probe:
+      exec:
+        command: docker-compose exec db pg_isready -U postgres
+      initial_delay_seconds: 2
+      period_seconds: 3
+
+  air:
+    command: air
+    depends_on:
+      db:
+        condition: process_healthy
+
+  templ:
+    command: templ generate --watch
+
+  tailwind:
+    command: tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --watch

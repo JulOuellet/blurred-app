@@ -23,6 +23,7 @@
         postgresql
         templ.packages.${system}.templ
         tailwindcss_4
+        process-compose
       ];
 
       shellHook = ''
