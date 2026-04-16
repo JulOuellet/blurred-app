@@ -7,9 +7,11 @@ templ Topbar(title string) {
 	<header class="h-12 w-full flex items-center justify-between px-4 bg-neutral-100 shrink-0">
 		<div class="flex items-center gap-3">
 			<button
-				@click="sidebarOpen = !sidebarOpen"
+				x-show="!sidebarOpen"
+				x-cloak
+				@click="sidebarOpen = true"
 				class="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200 transition-colors"
-				title="Toggle sidebar"
+				title="Open sidebar"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>

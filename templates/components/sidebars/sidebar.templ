@@ -12,7 +12,16 @@ templ Sidebar(sportsList []sports.SportWithSeasons, activeID string, isOOB bool)
 			hx-swap-oob="true"
 		}
 	>
-		<div class="px-5 flex items-center h-12">
+		<div class="px-3 flex items-center gap-2 h-12">
+			<button
+				@click="sidebarOpen = !sidebarOpen"
+				class="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200 transition-colors"
+				title="Toggle sidebar"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+				</svg>
+			</button>
 			<a
 				href="/"
 				hx-get="/"
