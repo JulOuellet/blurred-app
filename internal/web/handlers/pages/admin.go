@@ -3,6 +3,7 @@ package pages
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
@@ -42,9 +43,11 @@ func (h *AdminPageHandler) PostLogin(c echo.Context) error {
 	c.SetCookie(&http.Cookie{
 		Name:     "admin_token",
 		Value:    secret,
-		Path:     "/admin",
+		Path:     "/",
 		HttpOnly: true,
+		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
+		MaxAge:   int((7 * 24 * time.Hour).Seconds()),
 	})
 
 	return c.Redirect(http.StatusFound, "/admin/integrations")
@@ -54,8 +57,9 @@ func (h *AdminPageHandler) PostLogout(c echo.Context) error {
 	c.SetCookie(&http.Cookie{
 		Name:     "admin_token",
 		Value:    "",
-		Path:     "/admin",
+		Path:     "/",
 		HttpOnly: true,
+		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
 		MaxAge:   -1,
 	})

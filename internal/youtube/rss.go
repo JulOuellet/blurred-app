@@ -9,6 +9,8 @@ import (
 
 const rssFeedURL = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"
 
+var rssClient = &http.Client{Timeout: 10 * time.Second}
+
 type atomFeed struct {
 	XMLName xml.Name   `xml:"feed"`
 	Title   string     `xml:"title"`
@@ -27,7 +29,7 @@ type atomEntry struct {
 func FetchFeed(channelID string) ([]FeedEntry, error) {
 	url := fmt.Sprintf(rssFeedURL, channelID)
 
-	resp, err := http.Get(url)
+	resp, err := rssClient.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch RSS feed: %w", err)
 	}

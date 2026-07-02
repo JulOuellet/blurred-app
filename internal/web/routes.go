@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"crypto/subtle"
 	"log/slog"
 	"net/http"
 	"os"
@@ -45,7 +46,17 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		},
 	}))
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
+
+	adminAuth := func(errorHandler func(err error, c echo.Context) error) echo.MiddlewareFunc {
+		return middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+			KeyLookup: "cookie:admin_token",
+			Validator: func(key string, c echo.Context) (bool, error) {
+				secret := os.Getenv("ADMIN_SESSION_SECRET")
+				return secret != "" && subtle.ConstantTimeCompare([]byte(key), []byte(secret)) == 1, nil
+			},
+			ErrorHandler: errorHandler,
+		})
+	}
 
 	sportRepository := sports.NewSportRepository(db)
 	seasonRepository := seasons.NewSeasonRepository(db)
@@ -61,7 +72,9 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	highlightService := highlights.NewHighlightService(highlightRepository)
 	integrationService := integrations.NewIntegrationService(integrationRepository)
 
-	api := e.Group("/api")
+	api := e.Group("/api", adminAuth(func(err error, c echo.Context) error {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	}))
 	{
 		sportHandler := sports.NewSportHandler(sportService)
 		sportsApi := api.Group("/sports")
@@ -145,14 +158,8 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	e.POST("/admin/logout", adminHandler.PostLogout)
 
 	adminGroup := e.Group("/admin")
-	adminGroup.Use(middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
-		KeyLookup: "cookie:admin_token",
-		Validator: func(key string, c echo.Context) (bool, error) {
-			return key == os.Getenv("ADMIN_SESSION_SECRET"), nil
-		},
-		ErrorHandler: func(err error, c echo.Context) error {
-			return c.Redirect(http.StatusFound, "/admin/login")
-		},
+	adminGroup.Use(adminAuth(func(err error, c echo.Context) error {
+		return c.Redirect(http.StatusFound, "/admin/login")
 	}))
 	adminGroup.GET("/integrations", adminHandler.ListIntegrations)
 	adminGroup.GET("/integrations/new", adminHandler.NewIntegrationForm)
