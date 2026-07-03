@@ -3,10 +3,12 @@ package pages
 import (
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
+	"github.com/JulOuellet/blurred-app/internal/inbox"
 	"github.com/JulOuellet/blurred-app/templates/admin"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -16,15 +18,18 @@ import (
 type AdminPageHandler struct {
 	integrationService integrations.IntegrationService
 	sportService       sports.SportService
+	inboxRepo          inbox.InboxRepository
 }
 
 func NewAdminPageHandler(
 	integrationService integrations.IntegrationService,
 	sportService sports.SportService,
+	inboxRepo inbox.InboxRepository,
 ) AdminPageHandler {
 	return AdminPageHandler{
 		integrationService: integrationService,
 		sportService:       sportService,
+		inboxRepo:          inboxRepo,
 	}
 }
 
@@ -148,6 +153,46 @@ func (h *AdminPageHandler) DeleteIntegration(c echo.Context) error {
 	}
 
 	return c.Redirect(http.StatusFound, "/admin/integrations")
+}
+
+func (h *AdminPageHandler) ListInbox(c echo.Context) error {
+	status := c.QueryParam("status")
+	if status != "" && !slices.Contains(inbox.AllStatuses, status) {
+		status = ""
+	}
+
+	items, err := h.inboxRepo.List(status, 100)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load inbox")
+	}
+
+	counts, err := h.inboxRepo.CountsByStatus()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load inbox counts")
+	}
+
+	return admin.InboxListPage(admin.InboxListData{
+		Items:        items,
+		Counts:       counts,
+		ActiveFilter: status,
+	}).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *AdminPageHandler) RetryInboxItem(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid inbox item ID")
+	}
+
+	if err := h.inboxRepo.Retry(id); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retry inbox item")
+	}
+
+	redirect := "/admin/inbox"
+	if status := c.FormValue("status"); status != "" {
+		redirect += "?status=" + status
+	}
+	return c.Redirect(http.StatusFound, redirect)
 }
 
 func (h *AdminPageHandler) renderFormWithError(c echo.Context, errorMsg string) error {

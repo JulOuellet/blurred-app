@@ -13,6 +13,9 @@ type InboxRepository interface {
 	MarkCompleted(id uuid.UUID) error
 	MarkSkipped(id uuid.UUID, reason string) error
 	MarkFailed(id uuid.UUID, reason string) error
+	List(status string, limit int) ([]InboxItemWithChannel, error)
+	CountsByStatus() ([]StatusCount, error)
+	Retry(id uuid.UUID) error
 }
 
 type inboxRepository struct {
@@ -89,6 +92,59 @@ func (r *inboxRepository) MarkSkipped(id uuid.UUID, reason string) error {
 		WHERE id = $1
 	`
 	_, err := r.db.Exec(query, id, StatusSkipped, reason, time.Now())
+	return err
+}
+
+func (r *inboxRepository) List(status string, limit int) ([]InboxItemWithChannel, error) {
+	query := `
+		SELECT
+		  yi.id,
+		  yi.integration_id,
+		  yi.youtube_video_id,
+		  yi.video_title,
+		  yi.published_at,
+		  yi.status,
+		  yi.failure_reason,
+		  yi.retry_count,
+		  yi.processed_at,
+		  yi.created_at,
+		  yi.updated_at,
+		  i.youtube_channel_name AS channel_name
+		FROM youtube_inbox yi
+		JOIN integrations i ON i.id = yi.integration_id
+		WHERE ($1 = '' OR yi.status = $1)
+		ORDER BY yi.created_at DESC
+		LIMIT $2
+	`
+	var items []InboxItemWithChannel
+	err := r.db.Select(&items, query, status, limit)
+	return items, err
+}
+
+func (r *inboxRepository) CountsByStatus() ([]StatusCount, error) {
+	query := `
+		SELECT status, COUNT(*)::int AS count
+		FROM youtube_inbox
+		GROUP BY status
+	`
+	var counts []StatusCount
+	err := r.db.Select(&counts, query)
+	return counts, err
+}
+
+// Retry re-queues a finished item so the processor picks it up again,
+// e.g. after fixing the integration pattern that made it skip or fail.
+func (r *inboxRepository) Retry(id uuid.UUID) error {
+	query := `
+		UPDATE youtube_inbox
+		SET
+		  status = $2,
+		  retry_count = 0,
+		  failure_reason = NULL,
+		  processed_at = NULL
+		WHERE id = $1 AND status IN ($3, $4, $5)
+	`
+	_, err := r.db.Exec(query, id, StatusPending, StatusSkipped, StatusFailed, StatusDead)
 	return err
 }
 

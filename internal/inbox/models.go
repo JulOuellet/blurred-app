@@ -17,6 +17,16 @@ const (
 	MaxRetries = 3
 )
 
+// AllStatuses drives the admin inbox filter, in pipeline order.
+var AllStatuses = []string{
+	StatusPending,
+	StatusProcessing,
+	StatusCompleted,
+	StatusSkipped,
+	StatusFailed,
+	StatusDead,
+}
+
 type InboxItem struct {
 	ID             uuid.UUID  `db:"id"`
 	IntegrationID  uuid.UUID  `db:"integration_id"`
@@ -29,4 +39,14 @@ type InboxItem struct {
 	ProcessedAt    *time.Time `db:"processed_at"`
 	CreatedAt      time.Time  `db:"created_at"`
 	UpdatedAt      time.Time  `db:"updated_at"`
+}
+
+type InboxItemWithChannel struct {
+	InboxItem
+	ChannelName *string `db:"channel_name"`
+}
+
+type StatusCount struct {
+	Status string `db:"status"`
+	Count  int    `db:"count"`
 }

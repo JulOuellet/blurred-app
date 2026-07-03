@@ -19,6 +19,10 @@ templ Admin(title string) {
 						@logos.BlurredLogo("h-8 text-neutral-800")
 					</a>
 					<span class="text-xs font-medium uppercase tracking-wider text-neutral-400">Admin</span>
+					<nav class="flex items-center gap-3 ml-4">
+						<a href="/admin/integrations" class="text-sm font-medium text-neutral-500 hover:text-neutral-800">Integrations</a>
+						<a href="/admin/inbox" class="text-sm font-medium text-neutral-500 hover:text-neutral-800">Inbox</a>
+					</nav>
 				</div>
 				<form method="POST" action="/admin/logout">
 					<button type="submit" class="text-sm text-neutral-500 hover:text-neutral-800 cursor-pointer">

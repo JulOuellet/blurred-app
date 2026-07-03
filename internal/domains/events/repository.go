@@ -17,6 +17,7 @@ type EventRepository interface {
 		championshipId uuid.UUID,
 	) (*EventModel, error)
 	GetAllByChampionshipId(championshipId uuid.UUID, sortBy SortBy, sortDirection SortDirection) ([]EventModel, error)
+	GetRecentWithHighlights(limit int) ([]RecentEvent, error)
 }
 
 type eventRepository struct {
@@ -122,5 +123,35 @@ func (r *eventRepository) GetAllByChampionshipId(championshipId uuid.UUID, sortB
 	`, sortBy.Column(), sortDirection)
 	var events []EventModel
 	err := r.db.Select(&events, query, championshipId)
+	return events, err
+}
+
+// GetRecentWithHighlights returns the events whose highlights arrived most
+// recently, for the home page "Latest highlights" section.
+func (r *eventRepository) GetRecentWithHighlights(limit int) ([]RecentEvent, error) {
+	query := `
+		SELECT
+		  e.id,
+		  e.name,
+		  e.date,
+		  e.championship_id,
+		  e.created_at,
+		  e.updated_at,
+		  COUNT(h.id)::int AS highlight_count,
+		  MAX(h.created_at) AS latest_highlight_at,
+		  c.name AS championship_name,
+		  sp.name AS sport_name,
+		  s.id AS season_id
+		FROM events e
+		JOIN highlights h ON h.event_id = e.id
+		JOIN championships c ON c.id = e.championship_id
+		JOIN seasons s ON s.id = c.season_id
+		JOIN sports sp ON sp.id = s.sport_id
+		GROUP BY e.id, c.name, sp.name, s.id
+		ORDER BY latest_highlight_at DESC
+		LIMIT $1
+	`
+	var events []RecentEvent
+	err := r.db.Select(&events, query, limit)
 	return events, err
 }

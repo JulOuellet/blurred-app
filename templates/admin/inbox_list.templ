@@ -1,0 +1,153 @@
+package admin
+
+import (
+	"fmt"
+
+	"github.com/JulOuellet/blurred-app/internal/inbox"
+	"github.com/JulOuellet/blurred-app/templates/layouts"
+)
+
+type InboxListData struct {
+	Items        []inbox.InboxItemWithChannel
+	Counts       []inbox.StatusCount
+	ActiveFilter string
+}
+
+func statusCount(data InboxListData, status string) int {
+	total := 0
+	for _, c := range data.Counts {
+		if status == "" || c.Status == status {
+			total += c.Count
+		}
+	}
+	return total
+}
+
+func statusBadgeClass(status string) string {
+	base := "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium "
+	switch status {
+	case inbox.StatusPending:
+		return base + "bg-blue-100 text-blue-800"
+	case inbox.StatusProcessing:
+		return base + "bg-amber-100 text-amber-800"
+	case inbox.StatusCompleted:
+		return base + "bg-green-100 text-green-800"
+	case inbox.StatusFailed:
+		return base + "bg-orange-100 text-orange-800"
+	case inbox.StatusDead:
+		return base + "bg-red-100 text-red-800"
+	default:
+		return base + "bg-neutral-100 text-neutral-600"
+	}
+}
+
+func isRetryable(status string) bool {
+	return status == inbox.StatusSkipped || status == inbox.StatusFailed || status == inbox.StatusDead
+}
+
+func inboxChannelName(item inbox.InboxItemWithChannel) string {
+	if item.ChannelName != nil {
+		return *item.ChannelName
+	}
+	return "-"
+}
+
+func failureReason(item inbox.InboxItemWithChannel) string {
+	if item.FailureReason != nil {
+		return *item.FailureReason
+	}
+	return "-"
+}
+
+func publishedAt(item inbox.InboxItemWithChannel) string {
+	if item.PublishedAt != nil {
+		return item.PublishedAt.Format("Jan 2, 15:04")
+	}
+	return "-"
+}
+
+func filterURL(status string) templ.SafeURL {
+	if status == "" {
+		return templ.SafeURL("/admin/inbox")
+	}
+	return templ.SafeURL("/admin/inbox?status=" + status)
+}
+
+templ InboxListPage(data InboxListData) {
+	@layouts.Admin("Inbox") {
+		<div class="flex items-center justify-between mb-6">
+			<h1 class="text-2xl font-bold">YouTube Inbox</h1>
+		</div>
+		<div class="mb-4 flex flex-wrap gap-2">
+			@filterChip("", "All", data)
+			for _, status := range inbox.AllStatuses {
+				@filterChip(status, status, data)
+			}
+		</div>
+		if len(data.Items) == 0 {
+			<p class="text-neutral-500">No inbox items found.</p>
+		} else {
+			<div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-x-auto">
+				<table class="w-full text-sm">
+					<thead class="bg-neutral-50 border-b border-neutral-200">
+						<tr>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Video</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Channel</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Status</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Reason</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Retries</th>
+							<th class="text-left px-4 py-3 font-medium text-neutral-500">Published</th>
+							<th class="text-right px-4 py-3 font-medium text-neutral-500">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-neutral-100">
+						for _, item := range data.Items {
+							<tr class="hover:bg-neutral-50">
+								<td class="px-4 py-3 max-w-sm">
+									<a
+										href={ templ.SafeURL("https://www.youtube.com/watch?v=" + item.YoutubeVideoID) }
+										target="_blank"
+										rel="noopener"
+										class="font-medium text-neutral-800 hover:text-pink-500 line-clamp-2"
+									>
+										{ item.VideoTitle }
+									</a>
+								</td>
+								<td class="px-4 py-3 text-neutral-600 whitespace-nowrap">{ inboxChannelName(item) }</td>
+								<td class="px-4 py-3">
+									<span class={ statusBadgeClass(item.Status) }>{ item.Status }</span>
+								</td>
+								<td class="px-4 py-3 text-neutral-600 max-w-xs">
+									<span class="line-clamp-2" title={ failureReason(item) }>{ failureReason(item) }</span>
+								</td>
+								<td class="px-4 py-3 text-neutral-600">{ fmt.Sprintf("%d", item.RetryCount) }</td>
+								<td class="px-4 py-3 text-neutral-600 whitespace-nowrap">{ publishedAt(item) }</td>
+								<td class="px-4 py-3 text-right">
+									if isRetryable(item.Status) {
+										<form method="POST" action={ templ.SafeURL("/admin/inbox/" + item.ID.String() + "/retry") } class="inline">
+											<input type="hidden" name="status" value={ data.ActiveFilter }/>
+											<button type="submit" class="text-pink-500 hover:text-pink-700 font-medium cursor-pointer">Retry</button>
+										</form>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	}
+}
+
+templ filterChip(status string, label string, data InboxListData) {
+	<a
+		href={ filterURL(status) }
+		if data.ActiveFilter == status {
+			class="px-3 py-1.5 rounded-full text-xs font-medium bg-neutral-800 text-white"
+		} else {
+			class="px-3 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50"
+		}
+	>
+		{ label } ({ fmt.Sprintf("%d", statusCount(data, status)) })
+	</a>
+}

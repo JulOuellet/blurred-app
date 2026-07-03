@@ -12,6 +12,7 @@ type EventService interface {
 	GetById(id uuid.UUID) (*EventModel, error)
 	Create(req EventRequest) (*EventModel, error)
 	GetAllByChampionshipId(championshipId uuid.UUID, sortBy SortBy, sortDirection SortDirection) ([]EventModel, error)
+	GetRecentWithHighlights(limit int) ([]RecentEvent, error)
 }
 
 type eventService struct {
@@ -36,6 +37,10 @@ func (s *eventService) GetAllByChampionshipId(
 	sortDirection SortDirection,
 ) ([]EventModel, error) {
 	return s.eventRepo.GetAllByChampionshipId(championshipId, sortBy, sortDirection)
+}
+
+func (s *eventService) GetRecentWithHighlights(limit int) ([]RecentEvent, error) {
+	return s.eventRepo.GetRecentWithHighlights(limit)
 }
 
 func (s *eventService) Create(req EventRequest) (*EventModel, error) {

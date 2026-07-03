@@ -18,7 +18,7 @@ templ EventPage(
 	highlights []highlights.HighlightModel,
 	sportsList []sports.SportWithSeasons,
 ) {
-	@layouts.Base(championship.Name, sportsList, season.ID.String()) {
+	@layouts.Base(eventTitle(championship, season, event), sportsList, season.ID.String()) {
 		@EventContent(championship, sport, season, event, highlights)
 	}
 }
@@ -30,7 +30,7 @@ templ EventContent(
 	event *events.EventModel,
 	highlights []highlights.HighlightModel,
 ) {
-	<title hx-head="merge">{ layouts.PageTitle(event.Name) }</title>
+	<title hx-head="merge">{ layouts.PageTitle(eventTitle(championship, season, event)) }</title>
 	<div class="p-6 space-y-6">
 		@breadcrumbs.Breadcrumb([]breadcrumbs.BreadcrumbItem{
 			{Label: sport.Name, URL: "", IsActive: false},

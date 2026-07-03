@@ -14,6 +14,7 @@ import (
 	"github.com/JulOuellet/blurred-app/internal/domains/search"
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
+	"github.com/JulOuellet/blurred-app/internal/inbox"
 	"github.com/JulOuellet/blurred-app/internal/web/handlers/pages"
 	"github.com/JulOuellet/blurred-app/templates/layouts"
 	"github.com/jmoiron/sqlx"
@@ -130,7 +131,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		championshipService,
 		sportService,
 	)
-	homePageHandler := pages.NewHomePageHandler(sportService, championshipService)
+	homePageHandler := pages.NewHomePageHandler(sportService, championshipService, eventService)
 	e.GET("/", homePageHandler.GetHome)
 	e.GET("/seasons/:id", seasonPageHandler.GetSeason)
 
@@ -165,7 +166,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	e.GET("/search", searchHandler.Search)
 
 	// Admin routes
-	adminHandler := pages.NewAdminPageHandler(integrationService, sportService)
+	adminHandler := pages.NewAdminPageHandler(integrationService, sportService, inbox.NewInboxRepository(db))
 	e.GET("/admin/login", adminHandler.GetLogin)
 	e.POST("/admin/login", adminHandler.PostLogin)
 	e.POST("/admin/logout", adminHandler.PostLogout)
@@ -178,6 +179,8 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	adminGroup.GET("/integrations/new", adminHandler.NewIntegrationForm)
 	adminGroup.POST("/integrations", adminHandler.CreateIntegration)
 	adminGroup.POST("/integrations/:id/delete", adminHandler.DeleteIntegration)
+	adminGroup.GET("/inbox", adminHandler.ListInbox)
+	adminGroup.POST("/inbox/:id/retry", adminHandler.RetryInboxItem)
 
 	return e
 }

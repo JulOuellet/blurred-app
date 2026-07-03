@@ -3,17 +3,18 @@ package pages
 import "github.com/JulOuellet/blurred-app/templates/layouts"
 import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 import "github.com/JulOuellet/blurred-app/internal/domains/championships"
+import "github.com/JulOuellet/blurred-app/internal/domains/events"
 import "github.com/JulOuellet/blurred-app/templates/components/logos"
 import "github.com/JulOuellet/blurred-app/templates/components/cards"
 import "fmt"
 
-templ HomePage(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship) {
+templ HomePage(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship, recentEvents []events.RecentEvent) {
 	@layouts.Base("Blurred", sportsList, "") {
-		@HomeContent(sportsList, ongoingChampionships, upcomingChampionships)
+		@HomeContent(sportsList, ongoingChampionships, upcomingChampionships, recentEvents)
 	}
 }
 
-templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship) {
+templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship, recentEvents []events.RecentEvent) {
 	<title hx-head="merge">Blurred — Spoiler-Free Sports Highlights</title>
 	<div class="p-6 space-y-8">
 		<!-- Compact Hero -->
@@ -25,6 +26,48 @@ templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []c
 				A spoiler-free sports highlights browser
 			</p>
 		</div>
+		<!-- Latest Highlights -->
+		if len(recentEvents) > 0 {
+			<section>
+				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Latest highlights</h2>
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+					for _, ev := range recentEvents {
+						<a
+							href={ templ.SafeURL("/events/" + ev.ID.String()) }
+							hx-get={ templ.SafeURL("/events/" + ev.ID.String()) }
+							hx-target="#main-content"
+							hx-swap="innerHTML"
+							hx-push-url="true"
+							class="group flex flex-col justify-between rounded-xl bg-white p-5 shadow hover:shadow-md transition-shadow"
+						>
+							<div class="min-w-0">
+								<p class="text-xs font-medium text-neutral-500 truncate">{ ev.SportName } · { ev.ChampionshipName }</p>
+								<h3 class="text-base font-semibold text-neutral-800 group-hover:text-pink-500 transition-colors truncate mt-1">
+									{ ev.Name }
+								</h3>
+							</div>
+							<div class="flex items-center justify-between mt-3">
+								if ev.Date != nil {
+									<p class="text-xs text-neutral-500">{ ev.Date.Format("January 2, 2006") }</p>
+								} else {
+									<span></span>
+								}
+								<span class="inline-flex items-center gap-1.5 text-xs font-medium text-pink-600 whitespace-nowrap">
+									<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+										<path d="M8 5v14l11-7z"></path>
+									</svg>
+									if ev.HighlightCount == 1 {
+										1 highlight
+									} else {
+										{ fmt.Sprintf("%d highlights", ev.HighlightCount) }
+									}
+								</span>
+							</div>
+						</a>
+					}
+				</div>
+			</section>
+		}
 		<!-- Browse by Sport -->
 		<section>
 			<h2 class="text-lg font-semibold text-neutral-700 mb-4">Browse by sport</h2>

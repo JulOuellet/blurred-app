@@ -62,7 +62,8 @@ func (sb SortBy) Column() string {
 
 type RecentEvent struct {
 	EventModel
-	ChampionshipName string    `db:"championship_name"`
-	SportName        string    `db:"sport_name"`
-	SeasonID         uuid.UUID `db:"season_id"`
+	ChampionshipName  string    `db:"championship_name"`
+	SportName         string    `db:"sport_name"`
+	SeasonID          uuid.UUID `db:"season_id"`
+	LatestHighlightAt time.Time `db:"latest_highlight_at"`
 }
