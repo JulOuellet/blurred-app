@@ -12,15 +12,19 @@ templ Base(title string, sportsList []sports.SportWithSeasons, activeID string) 
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>{ title }</title>
+			<title>{ PageTitle(title) }</title>
 			<meta name="description" content="Watch sports highlights without spoilers. Blurred hides titles, thumbnails and results until you press play."/>
 			<meta name="theme-color" content="#262626"/>
+			if canonicalURL(ctx) != "" {
+				<link rel="canonical" href={ canonicalURL(ctx) }/>
+				<meta property="og:url" content={ canonicalURL(ctx) }/>
+			}
 			<meta property="og:site_name" content="Blurred"/>
 			<meta property="og:type" content="website"/>
-			<meta property="og:title" content={ title }/>
+			<meta property="og:title" content={ PageTitle(title) }/>
 			<meta property="og:description" content="Watch sports highlights without spoilers. Blurred hides titles, thumbnails and results until you press play."/>
-			if publicBaseURL() != "" {
-				<meta property="og:image" content={ publicBaseURL() + "/assets/img/og-image.png" }/>
+			if PublicBaseURL() != "" {
+				<meta property="og:image" content={ PublicBaseURL() + "/assets/img/og-image.png" }/>
 				<meta property="og:image:width" content="1200"/>
 				<meta property="og:image:height" content="630"/>
 				<meta name="twitter:card" content="summary_large_image"/>

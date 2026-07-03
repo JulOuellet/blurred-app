@@ -15,6 +15,7 @@ import (
 	"github.com/JulOuellet/blurred-app/internal/domains/seasons"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/internal/web/handlers/pages"
+	"github.com/JulOuellet/blurred-app/templates/layouts"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -46,6 +47,14 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 		},
 	}))
 	e.Use(middleware.Recover())
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			req := c.Request()
+			ctx := layouts.WithRequestPath(req.Context(), req.URL.Path)
+			c.SetRequest(req.WithContext(ctx))
+			return next(c)
+		}
+	})
 
 	adminAuth := func(errorHandler func(err error, c echo.Context) error) echo.MiddlewareFunc {
 		return middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
@@ -145,6 +154,10 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 
 	aboutPageHandler := pages.NewAboutPageHandler(sportService)
 	e.GET("/about", aboutPageHandler.GetAbout)
+
+	seoHandler := pages.NewSEOHandler(seasonService, championshipService, eventService)
+	e.GET("/robots.txt", seoHandler.GetRobotsTxt)
+	e.GET("/sitemap.xml", seoHandler.GetSitemap)
 
 	searchRepository := search.NewSearchRepository(db)
 	searchService := search.NewSearchService(searchRepository)
