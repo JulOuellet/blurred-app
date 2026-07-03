@@ -13,6 +13,7 @@ type EventModel struct {
 	ChampionshipID uuid.UUID  `json:"championshipId" db:"championship_id"`
 	CreatedAt      time.Time  `json:"createdAt" db:"created_at"`
 	UpdatedAt      time.Time  `json:"updatedAt" db:"updated_at"`
+	HighlightCount int        `json:"highlightCount" db:"highlight_count"`
 }
 
 type EventRequest struct {

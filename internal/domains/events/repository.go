@@ -106,18 +106,19 @@ func (r *eventRepository) Create(
 func (r *eventRepository) GetAllByChampionshipId(championshipId uuid.UUID, sortBy SortBy, sortDirection SortDirection) ([]EventModel, error) {
 	query := fmt.Sprintf(`
 	    SELECT
-		  id,
-		  name,
-		  date,
-		  championship_id,
-		  created_at,
-		  updated_at
+		  e.id,
+		  e.name,
+		  e.date,
+		  e.championship_id,
+		  e.created_at,
+		  e.updated_at,
+		  (SELECT COUNT(*) FROM highlights h WHERE h.event_id = e.id)::int AS highlight_count
 		FROM
-		  events
+		  events e
 		WHERE
-		  championship_id = $1
+		  e.championship_id = $1
 		ORDER BY
-		  %s %s
+		  e.%s %s
 	`, sortBy.Column(), sortDirection)
 	var events []EventModel
 	err := r.db.Select(&events, query, championshipId)

@@ -6,8 +6,9 @@ import "github.com/JulOuellet/blurred-app/templates/components/logos"
 templ Sidebar(sportsList []sports.SportWithSeasons, activeID string, isOOB bool) {
 	<aside
 		id="sidebar"
-		:class="!sidebarOpen && 'w-0!'"
-		class="w-60 flex flex-col shrink-0 bg-neutral-100 overflow-hidden transition-[width] duration-200 linear"
+		:class="sidebarOpen ? 'translate-x-0!' : 'md:w-0!'"
+		@click="if (window.innerWidth < 768 && $event.target.closest('a')) sidebarOpen = false"
+		class="fixed md:static inset-y-0 left-0 z-40 w-60 -translate-x-full md:translate-x-0 flex flex-col shrink-0 bg-neutral-100 overflow-hidden transition-[transform,width] duration-200 linear shadow-xl md:shadow-none"
 		if isOOB {
 			hx-swap-oob="true"
 		}

@@ -13,13 +13,33 @@ templ Base(title string, sportsList []sports.SportWithSeasons, activeID string) 
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title }</title>
+			<meta name="description" content="Watch sports highlights without spoilers. Blurred hides titles, thumbnails and results until you press play."/>
+			<meta name="theme-color" content="#262626"/>
+			<meta property="og:site_name" content="Blurred"/>
+			<meta property="og:type" content="website"/>
+			<meta property="og:title" content={ title }/>
+			<meta property="og:description" content="Watch sports highlights without spoilers. Blurred hides titles, thumbnails and results until you press play."/>
+			if publicBaseURL() != "" {
+				<meta property="og:image" content={ publicBaseURL() + "/assets/img/og-image.png" }/>
+				<meta property="og:image:width" content="1200"/>
+				<meta property="og:image:height" content="630"/>
+				<meta name="twitter:card" content="summary_large_image"/>
+			} else {
+				<meta name="twitter:card" content="summary"/>
+			}
 			<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg"/>
 			<link href="/assets/css/output.css" rel="stylesheet"/>
 			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
 			<script src="https://unpkg.com/htmx.org/dist/ext/head-support.js"></script>
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 		</head>
-		<body hx-ext="head-support" x-data="{ sidebarOpen: true }" class="h-full flex overflow-hidden antialiased font-sans text-neutral-800 bg-neutral-100">
+		<body hx-ext="head-support" x-data="{ sidebarOpen: window.innerWidth >= 768 }" class="h-full flex overflow-hidden antialiased font-sans text-neutral-800 bg-neutral-100">
+			<div
+				x-show="sidebarOpen"
+				x-cloak
+				@click="sidebarOpen = false"
+				class="fixed inset-0 z-30 bg-black/40 md:hidden"
+			></div>
 			@sidebars.Sidebar(sportsList, activeID, false)
 			<div class="flex-1 flex flex-col min-w-0 h-full transition-all duration-300">
 				@topbars.Topbar(title)
