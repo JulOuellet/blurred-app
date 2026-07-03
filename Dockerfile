@@ -7,17 +7,17 @@ RUN apt-get update && apt-get install -y curl git
 
 WORKDIR /app
 
-# 1. Install Templ
-RUN go install github.com/a-h/templ/cmd/templ@latest
-
-# 2. Install Tailwind CSS Standalone CLI
+# 1. Install Tailwind CSS Standalone CLI
 RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 && \
     chmod +x tailwindcss-linux-x64 && \
     mv tailwindcss-linux-x64 /usr/local/bin/tailwindcss
 
-# 3. Download Go Dependencies (Caching layer)
+# 2. Download Go Dependencies (Caching layer)
 COPY go.mod go.sum ./
 RUN go mod download
+
+# 3. Install Templ, pinned to the library version in go.mod
+RUN go install github.com/a-h/templ/cmd/templ@$(go list -m -f '{{.Version}}' github.com/a-h/templ)
 
 # 4. Copy Source Code
 COPY . .
