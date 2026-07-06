@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/JulOuellet/blurred-app/internal/domains/championships"
 	"github.com/JulOuellet/blurred-app/internal/domains/events"
@@ -129,22 +130,25 @@ func (p *Processor) ProcessNext() (bool, error) {
 	var matchedEvent *events.EventModel
 	if len(championshipEvents) == 1 {
 		matchedEvent = &championshipEvents[0]
-	} else if integration.StagePattern == nil {
-		return true, p.fail(item, "stage pattern required for championships with multiple events")
 	} else {
-		stageRe, err := regexp.Compile(*integration.StagePattern)
-		if err != nil {
-			return true, p.fail(item, fmt.Sprintf("invalid stage pattern: %v", err))
+		if integration.StagePattern != nil {
+			stageRe, err := regexp.Compile(*integration.StagePattern)
+			if err != nil {
+				return true, p.fail(item, fmt.Sprintf("invalid stage pattern: %v", err))
+			}
+			if eventNumber, ok := youtube.ExtractEventNumber(item.VideoTitle, stageRe); ok {
+				matchedEvent = matchEventByNumber(championshipEvents, eventNumber)
+			}
 		}
 
-		eventNumber, ok := youtube.ExtractEventNumber(item.VideoTitle, stageRe)
-		if !ok {
-			return true, p.fail(item, "no stage number found in title")
-		}
-
-		matchedEvent = matchEventByNumber(championshipEvents, eventNumber)
+		// Fallback for channels whose titles carry no stage number
+		// (e.g. Eurosport France): match by publish date instead.
 		if matchedEvent == nil {
-			return true, p.fail(item, fmt.Sprintf("no event matching stage %d", eventNumber))
+			matchedEvent = matchEventByDate(championshipEvents, *item.PublishedAt)
+		}
+
+		if matchedEvent == nil {
+			return true, p.fail(item, "no event matched by stage number or publish date")
 		}
 	}
 
@@ -218,5 +222,24 @@ func matchEventByNumber(evts []events.EventModel, number int) *events.EventModel
 		return &evts[number-1]
 	}
 
+	return nil
+}
+
+// matchEventByDate maps a video to the event on whose day it was published.
+// Highlights go up in the hours after a stage finishes, so the publish time
+// is shifted back 12h to keep late-night and next-morning uploads on the
+// stage that produced them.
+func matchEventByDate(evts []events.EventModel, publishedAt time.Time) *events.EventModel {
+	target := publishedAt.Add(-12 * time.Hour).UTC()
+	ty, tm, td := target.Date()
+	for i := range evts {
+		if evts[i].Date == nil {
+			continue
+		}
+		ey, em, ed := evts[i].Date.UTC().Date()
+		if ey == ty && em == tm && ed == td {
+			return &evts[i]
+		}
+	}
 	return nil
 }
