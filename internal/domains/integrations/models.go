@@ -34,4 +34,5 @@ type IntegrationRequest struct {
 	ContentFilter      string    `json:"contentFilter"`
 	TitleExclude       string    `json:"titleExclude"`
 	StagePattern       string    `json:"stagePattern"`
+	Active             bool      `json:"active"`
 }

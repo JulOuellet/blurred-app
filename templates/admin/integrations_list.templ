@@ -73,7 +73,11 @@ templ IntegrationsListPage(data IntegrationsListData) {
 						for _, item := range data.Items {
 							<tr class="hover:bg-neutral-50">
 								<td class="px-4 py-3 text-neutral-600">{ item.SportName }</td>
-								<td class="px-4 py-3 font-medium">{ channelName(item) }</td>
+								<td class="px-4 py-3 font-medium">
+									<a href={ templ.SafeURL("/admin/integrations/" + item.ID.String()) } class="hover:text-pink-500">
+										{ channelName(item) }
+									</a>
+								</td>
 								<td class="px-4 py-3 text-neutral-600">{ item.Lang }</td>
 								<td class="px-4 py-3 text-neutral-600 font-mono text-xs max-w-xs truncate">{ contentFilterDisplay(item) }</td>
 								<td class="px-4 py-3">
@@ -83,8 +87,9 @@ templ IntegrationsListPage(data IntegrationsListData) {
 										<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">Inactive</span>
 									}
 								</td>
-								<td class="px-4 py-3 text-right">
-									<form method="POST" action={ templ.SafeURL("/admin/integrations/" + item.ID.String() + "/delete") } class="inline" onsubmit="return confirm('Delete this integration?')">
+								<td class="px-4 py-3 text-right whitespace-nowrap">
+									<a href={ templ.SafeURL("/admin/integrations/" + item.ID.String()) } class="text-neutral-500 hover:text-neutral-800 font-medium mr-3">Edit</a>
+									<form method="POST" action={ templ.SafeURL("/admin/integrations/" + item.ID.String() + "/delete") } class="inline" onsubmit="return confirm('Delete this integration? This also deletes its inbox history.')">
 										<button type="submit" class="text-red-500 hover:text-red-700 cursor-pointer">Delete</button>
 									</form>
 								</td>

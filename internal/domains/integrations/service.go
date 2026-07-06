@@ -15,6 +15,7 @@ type IntegrationService interface {
 	GetById(id uuid.UUID) (*IntegrationModel, error)
 	GetAllActive() ([]IntegrationModel, error)
 	Create(req IntegrationRequest) (*IntegrationModel, error)
+	Update(id uuid.UUID, req IntegrationRequest) (*IntegrationModel, error)
 	Delete(id uuid.UUID) error
 }
 
@@ -42,7 +43,16 @@ func (s *integrationService) GetAllActive() ([]IntegrationModel, error) {
 	return s.integrationRepo.GetAllActive()
 }
 
-func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, error) {
+type normalizedIntegration struct {
+	channelID     string
+	channelName   string
+	lang          string
+	contentFilter *string
+	titleExclude  *string
+	stagePattern  *string
+}
+
+func normalizeRequest(req IntegrationRequest) (*normalizedIntegration, error) {
 	youtubeChannelID := strings.TrimSpace(req.YoutubeChannelID)
 	if youtubeChannelID == "" {
 		return nil, fmt.Errorf("youtube channel ID cannot be empty")
@@ -91,16 +101,49 @@ func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, 
 		stagePattern = &trimmedStagePattern
 	}
 
-	youtubeChannelName := strings.TrimSpace(req.YoutubeChannelName)
+	return &normalizedIntegration{
+		channelID:     youtubeChannelID,
+		channelName:   strings.TrimSpace(req.YoutubeChannelName),
+		lang:          lang,
+		contentFilter: contentFilter,
+		titleExclude:  titleExclude,
+		stagePattern:  stagePattern,
+	}, nil
+}
+
+func (s *integrationService) Create(req IntegrationRequest) (*IntegrationModel, error) {
+	n, err := normalizeRequest(req)
+	if err != nil {
+		return nil, err
+	}
 
 	return s.integrationRepo.Create(
-		youtubeChannelID,
-		youtubeChannelName,
+		n.channelID,
+		n.channelName,
 		req.SportID,
-		lang,
-		contentFilter,
-		titleExclude,
-		stagePattern,
+		n.lang,
+		n.contentFilter,
+		n.titleExclude,
+		n.stagePattern,
+	)
+}
+
+func (s *integrationService) Update(id uuid.UUID, req IntegrationRequest) (*IntegrationModel, error) {
+	n, err := normalizeRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.integrationRepo.Update(
+		id,
+		n.channelID,
+		n.channelName,
+		req.SportID,
+		n.lang,
+		n.contentFilter,
+		n.titleExclude,
+		n.stagePattern,
+		req.Active,
 	)
 }
 

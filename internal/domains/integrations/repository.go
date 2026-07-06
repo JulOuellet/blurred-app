@@ -21,6 +21,17 @@ type IntegrationRepository interface {
 		titleExclude *string,
 		stagePattern *string,
 	) (*IntegrationModel, error)
+	Update(
+		id uuid.UUID,
+		youtubeChannelID string,
+		youtubeChannelName string,
+		sportID uuid.UUID,
+		lang string,
+		contentFilter *string,
+		titleExclude *string,
+		stagePattern *string,
+		active bool,
+	) (*IntegrationModel, error)
 	Delete(id uuid.UUID) error
 	UpdateLastPolledAt(id uuid.UUID, t time.Time) error
 }
@@ -184,6 +195,63 @@ func (r *integrationRepository) Create(
 		contentFilter,
 		titleExclude,
 		stagePattern,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &integration, nil
+}
+
+func (r *integrationRepository) Update(
+	id uuid.UUID,
+	youtubeChannelID string,
+	youtubeChannelName string,
+	sportID uuid.UUID,
+	lang string,
+	contentFilter *string,
+	titleExclude *string,
+	stagePattern *string,
+	active bool,
+) (*IntegrationModel, error) {
+	query := `
+		UPDATE integrations
+		SET
+		  youtube_channel_id = $2,
+		  youtube_channel_name = $3,
+		  sport_id = $4,
+		  lang = $5,
+		  content_filter = $6,
+		  title_exclude = $7,
+		  stage_pattern = $8,
+		  active = $9
+		WHERE id = $1
+		RETURNING
+		  id,
+		  youtube_channel_id,
+		  youtube_channel_name,
+		  sport_id,
+		  lang,
+		  content_filter,
+		  title_exclude,
+		  stage_pattern,
+		  active,
+		  last_polled_at,
+		  created_at,
+		  updated_at
+	`
+	var integration IntegrationModel
+	err := r.db.Get(
+		&integration,
+		query,
+		id,
+		youtubeChannelID,
+		youtubeChannelName,
+		sportID,
+		lang,
+		contentFilter,
+		titleExclude,
+		stagePattern,
+		active,
 	)
 	if err != nil {
 		return nil, err

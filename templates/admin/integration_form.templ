@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
+	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/templates/layouts"
 )
@@ -9,6 +10,8 @@ import (
 type IntegrationFormData struct {
 	Sports   []sports.SportModel
 	ErrorMsg string
+	// Nil when creating; set when editing an existing integration.
+	Integration *integrations.IntegrationModel
 }
 
 type langOption struct {
@@ -29,18 +32,84 @@ func langOptions() []langOption {
 	}
 }
 
+func (d IntegrationFormData) isEdit() bool {
+	return d.Integration != nil
+}
+
+func (d IntegrationFormData) formAction() templ.SafeURL {
+	if d.isEdit() {
+		return templ.SafeURL("/admin/integrations/" + d.Integration.ID.String())
+	}
+	return templ.SafeURL("/admin/integrations")
+}
+
+func (d IntegrationFormData) channelID() string {
+	if d.isEdit() {
+		return d.Integration.YoutubeChannelID
+	}
+	return ""
+}
+
+func (d IntegrationFormData) channelName() string {
+	if d.isEdit() && d.Integration.YoutubeChannelName != nil {
+		return *d.Integration.YoutubeChannelName
+	}
+	return ""
+}
+
+func (d IntegrationFormData) sportSelected(id string) bool {
+	return d.isEdit() && d.Integration.SportID.String() == id
+}
+
+func (d IntegrationFormData) langSelected(code string) bool {
+	return d.isEdit() && d.Integration.Lang == code
+}
+
+func (d IntegrationFormData) contentFilter() string {
+	if d.isEdit() && d.Integration.ContentFilter != nil {
+		return *d.Integration.ContentFilter
+	}
+	return ""
+}
+
+func (d IntegrationFormData) titleExclude() string {
+	if d.isEdit() && d.Integration.TitleExclude != nil {
+		return *d.Integration.TitleExclude
+	}
+	return ""
+}
+
+func (d IntegrationFormData) stagePattern() string {
+	if d.isEdit() && d.Integration.StagePattern != nil {
+		return *d.Integration.StagePattern
+	}
+	return ""
+}
+
+func (d IntegrationFormData) lastPolled() string {
+	if d.isEdit() && d.Integration.LastPolledAt != nil {
+		return d.Integration.LastPolledAt.Format("Jan 2, 2006 15:04 MST")
+	}
+	return "never"
+}
+
 templ IntegrationFormPage(data IntegrationFormData) {
-	@layouts.Admin("New Integration") {
+	@layouts.Admin(pageHeading(data)) {
 		<div class="mb-6">
 			<a href="/admin/integrations" class="text-sm text-neutral-500 hover:text-neutral-800">&larr; Back to integrations</a>
 		</div>
-		<h1 class="text-2xl font-bold mb-6">New Integration</h1>
+		<h1 class="text-2xl font-bold mb-6">{ pageHeading(data) }</h1>
 		if data.ErrorMsg != "" {
 			<div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
 				{ data.ErrorMsg }
 			</div>
 		}
-		<form method="POST" action="/admin/integrations" class="space-y-5 max-w-2xl">
+		if data.isEdit() {
+			<p class="mb-6 text-sm text-neutral-500">
+				Last polled: { data.lastPolled() } &middot; Created: { data.Integration.CreatedAt.Format("Jan 2, 2006") }
+			</p>
+		}
+		<form method="POST" action={ data.formAction() } class="space-y-5 max-w-2xl">
 			<div>
 				<label for="youtubeChannelId" class="block text-sm font-medium text-neutral-700 mb-1">YouTube Channel ID</label>
 				<input
@@ -48,6 +117,7 @@ templ IntegrationFormPage(data IntegrationFormData) {
 					id="youtubeChannelId"
 					name="youtubeChannelId"
 					required
+					value={ data.channelID() }
 					placeholder="e.g. UCfDfvvMARk4TKcC62ALi6eA"
 					class="w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
 				/>
@@ -58,6 +128,7 @@ templ IntegrationFormPage(data IntegrationFormData) {
 					type="text"
 					id="youtubeChannelName"
 					name="youtubeChannelName"
+					value={ data.channelName() }
 					placeholder="e.g. TNT Sports Cycling"
 					class="w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
 				/>
@@ -72,7 +143,7 @@ templ IntegrationFormPage(data IntegrationFormData) {
 				>
 					<option value="">Select a sport</option>
 					for _, s := range data.Sports {
-						<option value={ s.ID.String() }>{ s.Name }</option>
+						<option value={ s.ID.String() } selected?={ data.sportSelected(s.ID.String()) }>{ s.Name }</option>
 					}
 				</select>
 			</div>
@@ -86,7 +157,7 @@ templ IntegrationFormPage(data IntegrationFormData) {
 				>
 					<option value="">Select a language</option>
 					for _, l := range langOptions() {
-						<option value={ l.Code }>{ l.Name }</option>
+						<option value={ l.Code } selected?={ data.langSelected(l.Code) }>{ l.Name }</option>
 					}
 				</select>
 			</div>
@@ -96,6 +167,7 @@ templ IntegrationFormPage(data IntegrationFormData) {
 					type="text"
 					id="contentFilter"
 					name="contentFilter"
+					value={ data.contentFilter() }
 					placeholder={ `e.g. (?i)highlights?` }
 					class="w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500 font-mono text-sm"
 				/>
@@ -107,6 +179,7 @@ templ IntegrationFormPage(data IntegrationFormData) {
 					type="text"
 					id="titleExclude"
 					name="titleExclude"
+					value={ data.titleExclude() }
 					placeholder={ `e.g. (?i)Women` }
 					class="w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500 font-mono text-sm"
 				/>
@@ -118,20 +191,44 @@ templ IntegrationFormPage(data IntegrationFormData) {
 					type="text"
 					id="stagePattern"
 					name="stagePattern"
+					value={ data.stagePattern() }
 					placeholder={ `e.g. (?i)Stage\s+(\d+)` }
 					class="w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500 font-mono text-sm"
 				/>
 				<p class="mt-1 text-xs text-neutral-400">Regex with a capture group to extract the stage number. When empty or not matching, the event is matched by publish date instead.</p>
 			</div>
+			if data.isEdit() {
+				<div class="flex items-center gap-2">
+					<input
+						type="checkbox"
+						id="active"
+						name="active"
+						checked?={ data.Integration.Active }
+						class="w-4 h-4 rounded border-neutral-300 text-neutral-800 focus:ring-neutral-500"
+					/>
+					<label for="active" class="text-sm font-medium text-neutral-700">Active (polled every 5 minutes)</label>
+				</div>
+			}
 			<div class="flex items-center gap-4 pt-2">
 				<button
 					type="submit"
 					class="px-4 py-2 bg-neutral-800 text-white text-sm font-medium rounded-lg hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 cursor-pointer"
 				>
-					Create integration
+					if data.isEdit() {
+						Save changes
+					} else {
+						Create integration
+					}
 				</button>
 				<a href="/admin/integrations" class="text-sm text-neutral-500 hover:text-neutral-800">Cancel</a>
 			</div>
 		</form>
 	}
+}
+
+func pageHeading(data IntegrationFormData) string {
+	if data.isEdit() {
+		return "Edit Integration"
+	}
+	return "New Integration"
 }

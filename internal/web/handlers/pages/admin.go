@@ -119,12 +119,72 @@ func (h *AdminPageHandler) NewIntegrationForm(c echo.Context) error {
 }
 
 func (h *AdminPageHandler) CreateIntegration(c echo.Context) error {
-	sportID, err := uuid.Parse(c.FormValue("sportId"))
+	req, err := integrationRequestFromForm(c)
 	if err != nil {
-		return h.renderFormWithError(c, "Invalid sport ID")
+		return h.renderFormWithError(c, "Invalid sport ID", nil)
 	}
 
-	req := integrations.IntegrationRequest{
+	if _, err := h.integrationService.Create(req); err != nil {
+		return h.renderFormWithError(c, err.Error(), nil)
+	}
+
+	return c.Redirect(http.StatusFound, "/admin/integrations")
+}
+
+func (h *AdminPageHandler) GetIntegration(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid integration ID")
+	}
+
+	integration, err := h.integrationService.GetById(id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Integration not found")
+	}
+
+	allSports, err := h.sportService.GetAll()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load sports")
+	}
+
+	return admin.IntegrationFormPage(admin.IntegrationFormData{
+		Sports:      allSports,
+		Integration: integration,
+	}).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *AdminPageHandler) UpdateIntegration(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid integration ID")
+	}
+
+	existing, err := h.integrationService.GetById(id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Integration not found")
+	}
+
+	req, err := integrationRequestFromForm(c)
+	if err != nil {
+		return h.renderFormWithError(c, "Invalid sport ID", existing)
+	}
+
+	if _, err := h.integrationService.Update(id, req); err != nil {
+		// Re-render with the submitted values so a regex typo doesn't
+		// wipe the rest of the edits.
+		return h.renderFormWithError(c, err.Error(), modelFromRequest(existing, req))
+	}
+
+	return c.Redirect(http.StatusFound, "/admin/integrations")
+}
+
+func integrationRequestFromForm(c echo.Context) (integrations.IntegrationRequest, error) {
+	sportID, err := uuid.Parse(c.FormValue("sportId"))
+	if err != nil {
+		return integrations.IntegrationRequest{}, err
+	}
+
+	return integrations.IntegrationRequest{
 		YoutubeChannelID:   c.FormValue("youtubeChannelId"),
 		YoutubeChannelName: c.FormValue("youtubeChannelName"),
 		SportID:            sportID,
@@ -132,14 +192,28 @@ func (h *AdminPageHandler) CreateIntegration(c echo.Context) error {
 		ContentFilter:      c.FormValue("contentFilter"),
 		TitleExclude:       c.FormValue("titleExclude"),
 		StagePattern:       c.FormValue("stagePattern"),
-	}
+		Active:             c.FormValue("active") == "on",
+	}, nil
+}
 
-	_, err = h.integrationService.Create(req)
-	if err != nil {
-		return h.renderFormWithError(c, err.Error())
-	}
+func modelFromRequest(existing *integrations.IntegrationModel, req integrations.IntegrationRequest) *integrations.IntegrationModel {
+	m := *existing
+	m.YoutubeChannelID = req.YoutubeChannelID
+	m.YoutubeChannelName = optional(req.YoutubeChannelName)
+	m.SportID = req.SportID
+	m.Lang = req.Lang
+	m.ContentFilter = optional(req.ContentFilter)
+	m.TitleExclude = optional(req.TitleExclude)
+	m.StagePattern = optional(req.StagePattern)
+	m.Active = req.Active
+	return &m
+}
 
-	return c.Redirect(http.StatusFound, "/admin/integrations")
+func optional(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
 }
 
 func (h *AdminPageHandler) DeleteIntegration(c echo.Context) error {
@@ -195,14 +269,15 @@ func (h *AdminPageHandler) RetryInboxItem(c echo.Context) error {
 	return c.Redirect(http.StatusFound, redirect)
 }
 
-func (h *AdminPageHandler) renderFormWithError(c echo.Context, errorMsg string) error {
+func (h *AdminPageHandler) renderFormWithError(c echo.Context, errorMsg string, integration *integrations.IntegrationModel) error {
 	allSports, err := h.sportService.GetAll()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to load sports")
 	}
 
 	return admin.IntegrationFormPage(admin.IntegrationFormData{
-		Sports:   allSports,
-		ErrorMsg: errorMsg,
+		Sports:      allSports,
+		ErrorMsg:    errorMsg,
+		Integration: integration,
 	}).Render(c.Request().Context(), c.Response().Writer)
 }

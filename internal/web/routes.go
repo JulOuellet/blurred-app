@@ -178,6 +178,8 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	adminGroup.GET("/integrations", adminHandler.ListIntegrations)
 	adminGroup.GET("/integrations/new", adminHandler.NewIntegrationForm)
 	adminGroup.POST("/integrations", adminHandler.CreateIntegration)
+	adminGroup.GET("/integrations/:id", adminHandler.GetIntegration)
+	adminGroup.POST("/integrations/:id", adminHandler.UpdateIntegration)
 	adminGroup.POST("/integrations/:id/delete", adminHandler.DeleteIntegration)
 	adminGroup.GET("/inbox", adminHandler.ListInbox)
 	adminGroup.POST("/inbox/:id/retry", adminHandler.RetryInboxItem)

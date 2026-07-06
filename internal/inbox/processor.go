@@ -142,7 +142,6 @@ func (p *Processor) ProcessNext() (bool, error) {
 		}
 
 		// Fallback for channels whose titles carry no stage number
-		// (e.g. Eurosport France): match by publish date instead.
 		if matchedEvent == nil {
 			matchedEvent = matchEventByDate(championshipEvents, *item.PublishedAt)
 		}
@@ -190,7 +189,8 @@ func (p *Processor) ProcessNext() (bool, error) {
 		return true, p.fail(item, fmt.Sprintf("failed to create highlight: %v", err))
 	}
 
-	slog.Info("created highlight",
+	slog.Info(
+		"created highlight",
 		"component", "processor",
 		"video_id", item.YoutubeVideoID,
 		"championship", matchedChampionship.Name,
@@ -225,10 +225,6 @@ func matchEventByNumber(evts []events.EventModel, number int) *events.EventModel
 	return nil
 }
 
-// matchEventByDate maps a video to the event on whose day it was published.
-// Highlights go up in the hours after a stage finishes, so the publish time
-// is shifted back 12h to keep late-night and next-morning uploads on the
-// stage that produced them.
 func matchEventByDate(evts []events.EventModel, publishedAt time.Time) *events.EventModel {
 	target := publishedAt.Add(-12 * time.Hour).UTC()
 	ty, tm, td := target.Date()
