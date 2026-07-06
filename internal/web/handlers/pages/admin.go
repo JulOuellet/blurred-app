@@ -6,6 +6,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/JulOuellet/blurred-app/internal/domains/highlights"
 	"github.com/JulOuellet/blurred-app/internal/domains/integrations"
 	"github.com/JulOuellet/blurred-app/internal/domains/sports"
 	"github.com/JulOuellet/blurred-app/internal/inbox"
@@ -19,17 +20,20 @@ type AdminPageHandler struct {
 	integrationService integrations.IntegrationService
 	sportService       sports.SportService
 	inboxRepo          inbox.InboxRepository
+	highlightRepo      highlights.HighlightRepository
 }
 
 func NewAdminPageHandler(
 	integrationService integrations.IntegrationService,
 	sportService sports.SportService,
 	inboxRepo inbox.InboxRepository,
+	highlightRepo highlights.HighlightRepository,
 ) AdminPageHandler {
 	return AdminPageHandler{
 		integrationService: integrationService,
 		sportService:       sportService,
 		inboxRepo:          inboxRepo,
+		highlightRepo:      highlightRepo,
 	}
 }
 
@@ -250,6 +254,32 @@ func (h *AdminPageHandler) ListInbox(c echo.Context) error {
 		Counts:       counts,
 		ActiveFilter: status,
 	}).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *AdminPageHandler) RemoveHighlight(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid inbox item ID")
+	}
+
+	item, err := h.inboxRepo.GetById(id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Inbox item not found")
+	}
+
+	if err := h.highlightRepo.DeleteByYoutubeID(item.YoutubeVideoID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete highlight")
+	}
+
+	if err := h.inboxRepo.MarkSkipped(item.ID, "highlight removed by admin"); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update inbox item")
+	}
+
+	redirect := "/admin/inbox"
+	if status := c.FormValue("status"); status != "" {
+		redirect += "?status=" + status
+	}
+	return c.Redirect(http.StatusFound, redirect)
 }
 
 func (h *AdminPageHandler) RetryInboxItem(c echo.Context) error {

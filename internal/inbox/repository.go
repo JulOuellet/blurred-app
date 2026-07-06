@@ -16,6 +16,7 @@ type InboxRepository interface {
 	List(status string, limit int) ([]InboxItemWithChannel, error)
 	CountsByStatus() ([]StatusCount, error)
 	Retry(id uuid.UUID) error
+	GetById(id uuid.UUID) (*InboxItem, error)
 }
 
 type inboxRepository struct {
@@ -70,6 +71,30 @@ func (r *inboxRepository) ClaimNext() (*InboxItem, error) {
 	var item InboxItem
 	err := r.db.Get(&item, query, StatusProcessing, StatusPending, StatusFailed, MaxRetries)
 	if err != nil {
+		return nil, err
+	}
+	return &item, nil
+}
+
+func (r *inboxRepository) GetById(id uuid.UUID) (*InboxItem, error) {
+	query := `
+		SELECT
+		  id,
+		  integration_id,
+		  youtube_video_id,
+		  video_title,
+		  published_at,
+		  status,
+		  failure_reason,
+		  retry_count,
+		  processed_at,
+		  created_at,
+		  updated_at
+		FROM youtube_inbox
+		WHERE id = $1
+	`
+	var item InboxItem
+	if err := r.db.Get(&item, query, id); err != nil {
 		return nil, err
 	}
 	return &item, nil

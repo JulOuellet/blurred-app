@@ -166,7 +166,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	e.GET("/search", searchHandler.Search)
 
 	// Admin routes
-	adminHandler := pages.NewAdminPageHandler(integrationService, sportService, inbox.NewInboxRepository(db))
+	adminHandler := pages.NewAdminPageHandler(integrationService, sportService, inbox.NewInboxRepository(db), highlightRepository)
 	e.GET("/admin/login", adminHandler.GetLogin)
 	e.POST("/admin/login", adminHandler.PostLogin)
 	e.POST("/admin/logout", adminHandler.PostLogout)
@@ -183,6 +183,7 @@ func RegisterRoutes(db *sqlx.DB) *echo.Echo {
 	adminGroup.POST("/integrations/:id/delete", adminHandler.DeleteIntegration)
 	adminGroup.GET("/inbox", adminHandler.ListInbox)
 	adminGroup.POST("/inbox/:id/retry", adminHandler.RetryInboxItem)
+	adminGroup.POST("/inbox/:id/remove-highlight", adminHandler.RemoveHighlight)
 
 	return e
 }

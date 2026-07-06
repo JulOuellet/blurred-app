@@ -21,6 +21,7 @@ type HighlightRepository interface {
 	) (*HighlightModel, error)
 	GetAllByEventId(eventId uuid.UUID) ([]HighlightModel, error)
 	ExistsByYoutubeID(youtubeID string) (bool, error)
+	DeleteByYoutubeID(youtubeID string) error
 }
 
 type highlightRepository struct {
@@ -175,4 +176,10 @@ func (r *highlightRepository) ExistsByYoutubeID(youtubeID string) (bool, error) 
 	var exists bool
 	err := r.db.Get(&exists, query, youtubeID)
 	return exists, err
+}
+
+func (r *highlightRepository) DeleteByYoutubeID(youtubeID string) error {
+	query := `DELETE FROM highlights WHERE youtube_id = $1`
+	_, err := r.db.Exec(query, youtubeID)
+	return err
 }
