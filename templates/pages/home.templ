@@ -5,31 +5,26 @@ import "github.com/JulOuellet/blurred-app/internal/domains/sports"
 import "github.com/JulOuellet/blurred-app/internal/domains/championships"
 import "github.com/JulOuellet/blurred-app/internal/domains/events"
 import "github.com/JulOuellet/blurred-app/templates/components/logos"
-import "github.com/JulOuellet/blurred-app/templates/components/cards"
 import "fmt"
 
-templ HomePage(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship, recentEvents []events.RecentEvent) {
+templ HomePage(sportsList []sports.SportWithSeasons, hero *HomeHero, upcomingChampionships []championships.HomeChampionship, recentEvents []events.RecentEvent) {
 	@layouts.Base("Blurred", sportsList, "") {
-		@HomeContent(sportsList, ongoingChampionships, upcomingChampionships, recentEvents)
+		@HomeContent(hero, upcomingChampionships, recentEvents)
 	}
 }
 
-templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []championships.HomeChampionship, upcomingChampionships []championships.HomeChampionship, recentEvents []events.RecentEvent) {
+templ HomeContent(hero *HomeHero, upcomingChampionships []championships.HomeChampionship, recentEvents []events.RecentEvent) {
 	<title hx-head="merge">Blurred — Spoiler-Free Sports Highlights</title>
-	<div class="p-6 space-y-8">
-		<!-- Compact Hero -->
-		<div class="relative overflow-hidden rounded-2xl bg-neutral-800 px-8 py-12 flex flex-col items-center text-center">
-			<div class="text-white mb-3">
-				@logos.BlurredLogo("h-16 sm:h-20 w-auto")
-			</div>
-			<p class="text-neutral-400 text-lg font-medium">
-				A spoiler-free sports highlights browser
-			</p>
-		</div>
-		<!-- Latest Highlights -->
+	<div class="p-4 sm:p-6 space-y-8">
+		if hero != nil {
+			@heroSection(hero)
+		} else {
+			@fallbackHero(upcomingChampionships)
+		}
+		<!-- Catch up -->
 		if len(recentEvents) > 0 {
 			<section>
-				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Latest highlights</h2>
+				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Catch up</h2>
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					for _, ev := range recentEvents {
 						<a
@@ -41,14 +36,14 @@ templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []c
 							class="group flex flex-col justify-between rounded-xl bg-white p-5 shadow hover:shadow-md transition-shadow"
 						>
 							<div class="min-w-0">
-								<p class="text-xs font-medium text-neutral-500 truncate">{ ev.SportName } · { ev.ChampionshipName }</p>
+								<p class="text-xs font-medium text-neutral-500 truncate">{ ev.ChampionshipName }</p>
 								<h3 class="text-base font-semibold text-neutral-800 group-hover:text-pink-500 transition-colors truncate mt-1">
 									{ ev.Name }
 								</h3>
 							</div>
 							<div class="flex items-center justify-between mt-3">
 								if ev.Date != nil {
-									<p class="text-xs text-neutral-500">{ ev.Date.Format("January 2, 2006") }</p>
+									<p class="text-xs text-neutral-500">{ relativeDate(ev.Date) }</p>
 								} else {
 									<span></span>
 								}
@@ -68,58 +63,11 @@ templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []c
 				</div>
 			</section>
 		}
-		<!-- Browse by Sport -->
-		<section>
-			<h2 class="text-lg font-semibold text-neutral-700 mb-4">Browse by sport</h2>
-			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-				for _, sport := range sportsList {
-					if len(sport.Seasons) > 0 {
-						<a
-							href={ templ.SafeURL("/seasons/" + sport.Seasons[0].ID.String()) }
-							hx-get={ templ.SafeURL("/seasons/" + sport.Seasons[0].ID.String()) }
-							hx-target="#main-content"
-							hx-swap="innerHTML"
-							hx-push-url="true"
-							class="group relative flex flex-col justify-between rounded-xl bg-white p-5 shadow hover:shadow-md transition-shadow"
-						>
-							<h3 class="text-base font-semibold text-neutral-800 group-hover:text-pink-500 transition-colors">
-								{ sport.Name }
-							</h3>
-							<p class="text-sm text-neutral-500 mt-1">
-								{ fmt.Sprintf("%d", len(sport.Seasons)) }
-								if len(sport.Seasons) == 1 {
-									season
-								} else {
-									seasons
-								}
-							</p>
-							<svg class="absolute top-5 right-4 w-5 h-5 text-neutral-300 group-hover:text-pink-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-							</svg>
-						</a>
-					}
-				}
-			</div>
-		</section>
-		<!-- Ongoing Championships -->
-		if len(ongoingChampionships) > 0 {
-			<section>
-				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Ongoing championships</h2>
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-					for _, champ := range ongoingChampionships {
-						<div>
-							<p class="text-xs font-medium text-neutral-500 mb-1">{ champ.SportName }</p>
-							@cards.ChampionshipCard(champ.ChampionshipModel)
-						</div>
-					}
-				</div>
-			</section>
-		}
-		<!-- Upcoming Championships -->
+		<!-- Coming up -->
 		if len(upcomingChampionships) > 0 {
 			<section>
-				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Upcoming championships</h2>
-				<div class="space-y-3">
+				<h2 class="text-lg font-semibold text-neutral-700 mb-4">Coming up</h2>
+				<div class="flex flex-wrap gap-2">
 					for _, champ := range upcomingChampionships {
 						<a
 							href={ templ.SafeURL("/championships/" + champ.ID.String()) }
@@ -127,31 +75,147 @@ templ HomeContent(sportsList []sports.SportWithSeasons, ongoingChampionships []c
 							hx-target="#main-content"
 							hx-swap="innerHTML"
 							hx-push-url="true"
-							class="flex items-center gap-4 p-4 bg-white rounded-xl shadow hover:shadow-md hover:bg-neutral-50 transition-all"
+							class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow hover:shadow-md transition-shadow"
 						>
-							<div class="flex-shrink-0 w-14 h-14 rounded-lg bg-neutral-100 flex flex-col items-center justify-center text-center">
-								if champ.StartDate != nil {
-									<span class="text-xs font-semibold text-pink-500 uppercase leading-none">
-										{ champ.StartDate.Format("Jan") }
-									</span>
-									<span class="text-lg font-bold text-neutral-800 leading-tight">
-										{ champ.StartDate.Format("02") }
-									</span>
-								}
-							</div>
-							<div class="flex-1 min-w-0">
-								<h3 class="text-sm font-semibold text-neutral-800 truncate">{ champ.Name }</h3>
-								<p class="text-xs text-neutral-500 truncate">
-									{ champ.SportName }
-								</p>
-							</div>
-							<svg class="flex-shrink-0 w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-							</svg>
+							if isOngoing(champ) {
+								<span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+							}
+							<span class="text-sm font-medium text-neutral-800">{ champ.Name }</span>
+							if champ.StartDate != nil {
+								<span class="text-xs text-neutral-500 whitespace-nowrap">{ relativeDate(champ.StartDate) }</span>
+							}
 						</a>
 					}
 				</div>
 			</section>
 		}
 	</div>
+}
+
+// heroSection is the "happening now" block: the ongoing race, one primary
+// call to action to the freshest highlights, and a strip of every stage so
+// catching up is a single click.
+templ heroSection(hero *HomeHero) {
+	<section class="relative overflow-hidden rounded-2xl bg-neutral-900 shadow-lg">
+		if hero.Championship.ReferenceImgURL != "" {
+			<img alt="" src={ hero.Championship.ReferenceImgURL } class="absolute inset-0 w-full h-full object-cover opacity-40"/>
+		}
+		<div class="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/70 to-neutral-900/30"></div>
+		<div class="relative px-5 py-8 sm:px-10 sm:py-12 space-y-5">
+			<div>
+				<p class="text-xs font-semibold tracking-widest uppercase text-pink-400">
+					Happening now
+					if hero.Championship.StartDate != nil {
+						{ " · " + heroDateRange(hero.Championship.StartDate, hero.Championship.EndDate) }
+					}
+				</p>
+				<h1 class="text-3xl sm:text-4xl font-bold text-white mt-1">{ hero.Championship.Name }</h1>
+			</div>
+			if hero.Latest != nil {
+				<a
+					href={ templ.SafeURL("/events/" + hero.Latest.ID.String()) }
+					hx-get={ templ.SafeURL("/events/" + hero.Latest.ID.String()) }
+					hx-target="#main-content"
+					hx-swap="innerHTML"
+					hx-push-url="true"
+					class="inline-flex items-center gap-3 rounded-xl bg-pink-500 hover:bg-pink-600 transition-colors px-5 py-3 shadow-lg"
+				>
+					<span class="flex w-10 h-10 rounded-full bg-white/20 items-center justify-center shrink-0">
+						<svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M8 5v14l11-7z"></path>
+						</svg>
+					</span>
+					<span class="text-left">
+						<span class="block text-base font-semibold text-white">{ "Watch " + hero.Latest.Name + " highlights" }</span>
+						<span class="block text-xs text-pink-100 mt-0.5">
+							if hero.Latest.Date != nil {
+								{ relativeDate(hero.Latest.Date) + " · " }
+							}
+							if hero.Latest.HighlightCount == 1 {
+								1 highlight
+							} else {
+								{ fmt.Sprintf("%d highlights", hero.Latest.HighlightCount) }
+							}
+						</span>
+					</span>
+				</a>
+			} else {
+				<p class="text-sm text-neutral-300">
+					The race is on — highlights will appear here as soon as the first stage finishes.
+				</p>
+			}
+			if len(hero.Events) > 1 {
+				<div
+					class="flex gap-2 overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+					x-data
+					x-init="$el.querySelector('[data-latest]')?.scrollIntoView({ inline: 'center', block: 'nearest' })"
+				>
+					for i := range hero.Events {
+						@stageChip(hero.Events[i], hero.Latest != nil && hero.Events[i].ID == hero.Latest.ID)
+					}
+				</div>
+			}
+			<p class="text-sm text-neutral-400">
+				No titles, no thumbnails, no results — nothing is revealed until you press play.
+			</p>
+		</div>
+	</section>
+}
+
+// stageChip is one entry in the hero's stage strip. Stages with highlights
+// are bright and clickable, future stages are dimmed but still lead to the
+// event page and its "hasn't happened yet" note.
+templ stageChip(ev events.EventModel, isLatest bool) {
+	<a
+		href={ templ.SafeURL("/events/" + ev.ID.String()) }
+		hx-get={ templ.SafeURL("/events/" + ev.ID.String()) }
+		hx-target="#main-content"
+		hx-swap="innerHTML"
+		hx-push-url="true"
+		if isLatest {
+			data-latest
+			class="inline-flex items-center gap-1.5 rounded-full bg-pink-500 text-white px-3 py-1.5 text-xs font-semibold whitespace-nowrap hover:bg-pink-600 transition-colors"
+		} else {
+			if ev.HighlightCount > 0 {
+				class="inline-flex items-center gap-1.5 rounded-full bg-white/15 text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap hover:bg-white/25 transition-colors"
+			} else {
+				class="inline-flex items-center gap-1.5 rounded-full bg-white/5 text-neutral-400 px-3 py-1.5 text-xs font-medium whitespace-nowrap hover:bg-white/10 transition-colors"
+			}
+		}
+	>
+		if ev.HighlightCount > 0 {
+			<svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
+				<path d="M8 5v14l11-7z"></path>
+			</svg>
+		}
+		{ ev.Name }
+	</a>
+}
+
+// fallbackHero keeps the branded introduction for the quiet weeks when no
+// championship is ongoing, pointing at the next race instead.
+templ fallbackHero(upcomingChampionships []championships.HomeChampionship) {
+	<section class="relative overflow-hidden rounded-2xl bg-neutral-800 px-8 py-12 flex flex-col items-center text-center space-y-4">
+		<div class="text-white">
+			@logos.BlurredLogo("h-16 sm:h-20 w-auto")
+		</div>
+		<p class="text-neutral-400 text-lg font-medium">
+			No titles, no thumbnails, no results — nothing is revealed until you press play.
+		</p>
+		if len(upcomingChampionships) > 0 {
+			<a
+				href={ templ.SafeURL("/championships/" + upcomingChampionships[0].ID.String()) }
+				hx-get={ templ.SafeURL("/championships/" + upcomingChampionships[0].ID.String()) }
+				hx-target="#main-content"
+				hx-swap="innerHTML"
+				hx-push-url="true"
+				class="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors px-4 py-2 text-sm font-medium text-white"
+			>
+				{ "Next race: " + upcomingChampionships[0].Name }
+				if upcomingChampionships[0].StartDate != nil {
+					<span class="text-neutral-400">{ relativeDate(upcomingChampionships[0].StartDate) }</span>
+				}
+			</a>
+		}
+	</section>
 }
