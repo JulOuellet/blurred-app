@@ -32,7 +32,7 @@ templ Base(title string, sportsList []sports.SportWithSeasons, activeID string) 
 				<meta name="twitter:card" content="summary"/>
 			}
 			<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg"/>
-			<link href="/assets/css/output.css" rel="stylesheet"/>
+			<link href={ "/assets/css/output.css?v=" + AssetVersion() } rel="stylesheet"/>
 			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
 			<script src="https://unpkg.com/htmx.org/dist/ext/head-support.js"></script>
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>

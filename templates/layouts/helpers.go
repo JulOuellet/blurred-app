@@ -3,8 +3,24 @@ package layouts
 import (
 	"context"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
+
+var assetVersion = func() string {
+	if sha := os.Getenv("RAILWAY_GIT_COMMIT_SHA"); len(sha) >= 8 {
+		return sha[:8]
+	}
+	return strconv.FormatInt(time.Now().Unix(), 10)
+}()
+
+// AssetVersion returns a value that changes on every deploy, appended to
+// static asset URLs so CDN and browser caches (Cloudflare caches CSS for
+// hours) can never serve a stylesheet from a previous release.
+func AssetVersion() string {
+	return assetVersion
+}
 
 // PublicBaseURL returns the canonical origin of the deployed site (e.g.
 // "https://blurred.watch"), used to build the absolute URLs that OpenGraph
